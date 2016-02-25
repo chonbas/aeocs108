@@ -44,17 +44,17 @@ CREATE TABLE Messages (
 
 CREATE TABLE Quizzes (
 	QuizID VARCHAR(100), 	
-	CreatorID VARCHAR(100), 
+	UserID VARCHAR(100), 
 	DateCreated DATE,
 	QuizName VARCHAR(1000),
 	Description VARCHAR(1000),	
 
 	PRIMARY KEY(QuizID),
-	FOREIGN KEY(CreatorID) REFERENCES Users(UserID)
+	FOREIGN KEY(UserID) REFERENCES Users(UserID)
 );
 
 CREATE TABLE Questions (
-	QuizID INTEGER,
+	QuizID  VARCHAR(100),
 	QuestionNumber INTEGER, 
 	Text VARCHAR(1000), 
 	QuestionType VARCHAR(100), 
@@ -64,7 +64,7 @@ CREATE TABLE Questions (
 );
 
 CREATE TABLE Answers (
-	QuizID INTEGER,
+	QuizID  VARCHAR(100),
 	QuestionNumber INTEGER,
 	AnswerNumber INTEGER,
 	Text VARCHAR(1000),
