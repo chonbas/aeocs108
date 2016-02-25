@@ -1,19 +1,12 @@
 package database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.*;
-
-import finalproj.Answer;
-import finalproj.Question;
-
-import messaging.Message;
-
-import scoreboard.Score;
 import users.User;
+import messaging.Message;
+import quizzes.Answer;
+import quizzes.Question;
+import scoreboard.Score;
 
 public class DB_Interface {
 	
@@ -39,6 +32,20 @@ public class DB_Interface {
 		}
 	}
 	
+	
+	public Statement getConnectionStatement(){
+		return stmt;
+	}
+	
+	protected void closeConnection(){
+		try {
+			connection.close();
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+	}
+	
+	
 	/*
 	 * Users	
 	 * ===============
@@ -47,55 +54,6 @@ public class DB_Interface {
 	 * Admin	Boolean
 	 */
 	
-	public User getUser(String username) {		
-		ResultSet rs;
-		try {
-			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE Users.UserID = " + username);
-			return new User(rs.getString("UserID"));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	public User createUser(String username, String password){
-		try {
-			stmt.executeQuery("INSERT INTO Users (UserID, Password, Admin) "
-				+ "VALUES ('" + username + "','" + password + "','false'");
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return getUser(username);
-	}
-	
-	public boolean validateUsername(String username) {
-		ResultSet rs = null;
-		try {
-			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE Users.UserID = " + username);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(rs != null) {
-			return true;
-		}
-		return false;
-	}
-	public boolean validatePassword(String username, String password){
-		ResultSet rs = null;
-		try {
-			rs = stmt.executeQuery("SELECT * FROM Users WHERE Users.UserID = " + username + " AND password = " + password);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		if(rs != null) {
-			return true;
-		}
-		return false;		
-	}
 
 	/*
 	 * Messages
@@ -157,6 +115,7 @@ public class DB_Interface {
 			e.printStackTrace();
 		}
 	}
+	
 	public Message getMessage(Integer messageID) {
 		ResultSet rs = null;
 		try {
