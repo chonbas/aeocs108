@@ -66,7 +66,7 @@ public class User {
 	}
 	
 	//get all friends requests for the given user and validate the requests, if valid, append to arraylist
-	public ArrayList<String> getFriends(DB_Interface db){
+	public static ArrayList<String> getFriends(String username, DB_Interface db){
 		ArrayList<String> friends = new ArrayList<String>();
 		Set<String> friendsSent = new HashSet<String>();
 		Set<String> friendsReceived = new HashSet<String>();
