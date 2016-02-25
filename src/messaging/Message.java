@@ -33,8 +33,8 @@ public class Message {
 		this.content = content;
 		Statement stmt = db.getConnectionStatement();
 		try {
-			stmt.executeQuery("INSERT INTO Messages (MessageID, SenderID, ReceiverID, Content, Received, SenderDelete, ReceiverDelete, Alert) "
-				+ "VALUES ('NULL','" + sender_id + "','" + receiver_id + "','" + content + "','" + "'false','false','false','false')");
+			stmt.executeUpdate("INSERT INTO Messages (SenderID, ReceiverID, Content, Received, SenderDelete, ReceiverDelete, Alert) "
+				+ "VALUES (\"" + sender_id + "\",\"" + receiver_id + "\",\"" + content + "\",\"0\",\"0\",\"0\",\"0\");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -62,14 +62,14 @@ public class Message {
 			if (rs.getString("SenderID").equals(userRequesting)) {
 				if (!rs.getBoolean(7)) {
 					try {
-						stmt.executeQuery("DELETE from Messages WHERE msg_id = " + msg_id);
+						stmt.executeUpdate("DELETE from Messages WHERE msg_id = " + msg_id);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					} 	
 				}
 				if (!rs.getBoolean(6)) {
 					try {
-						stmt.executeQuery("UPDATE Messages SET SenderDelete = 'true' WHERE MessageID = " + msg_id);
+						stmt.executeUpdate("UPDATE Messages SET SenderDelete = '1' WHERE MessageID = " + msg_id);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -77,13 +77,13 @@ public class Message {
 			} else if (rs.getString("ReceiverID").equals(userRequesting)) {
 				if (!rs.getBoolean("SenderDelete")) {
 					try {
-						stmt.executeQuery("DELETE from Messages WHERE msg_id = " + msg_id);
+						stmt.executeUpdate("DELETE from Messages WHERE msg_id = " + msg_id);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					} 					
 				} else if (!rs.getBoolean("ReceiverDelete")) {
 					try {
-						stmt.executeQuery("UPDATE Messages SET ReceiverDelete = 'true' WHERE MessageID = " + msg_id);
+						stmt.executeUpdate("UPDATE Messages SET ReceiverDelete = '1' WHERE MessageID = " + msg_id);
 					} catch (SQLException e) {
 						e.printStackTrace();
 					}
@@ -97,8 +97,9 @@ public class Message {
 	public static Message getMessage(Integer messageID, DB_Interface db) {
 		Statement stmt = db.getConnectionStatement();
 		ResultSet rs = null;
+		System.out.println(messageID);
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Messages WHERE Messages.MessageID = " + messageID);
+			rs = stmt.executeQuery("SELECT * FROM Messages WHERE MessageID = \"" + messageID+"\";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -120,9 +121,11 @@ public class Message {
 	 */
 	private Message(ResultSet rs){
 		try {
-			this.sender_id = rs.getString("SenderID");
-			this.receiver_id = rs.getString("ReceiverID");
-			this.content = rs.getString("Content");
+			if (rs.first()){
+				this.sender_id = rs.getString("SenderID");
+				this.receiver_id = rs.getString("ReceiverID");
+				this.content = rs.getString("Content");
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -132,46 +135,41 @@ public class Message {
 	public static ArrayList<Message> getOutboundMessages(String username, DB_Interface db){
 		Statement stmt = db.getConnectionStatement();
 		ArrayList<Message> messages = new ArrayList<Message>();
+		ArrayList<Integer> message_ids = new ArrayList<Integer>();
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Messages WHERE Messages.SenderID = " + username);
+			rs = stmt.executeQuery("SELECT * FROM Messages WHERE SenderID = \"" + username+"\";");
+			while (rs.next()){
+				int messageID = Integer.parseInt(rs.getString("MessageID"));
+				message_ids.add(messageID);
+			}
+			for (Integer id:message_ids){
+				messages.add(getMessage(id,db));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		if(rs != null) {
-			try {
-				messages.add(getMessage(rs.getInt(1), db));
-
-				while (rs.next()){
-					messages.add(getMessage(rs.getInt(1), db));
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		return messages;				
 	}
 	
 	public static ArrayList<Message> getIncomingMessages(String username, DB_Interface db) {
 		ArrayList<Message> messages = new ArrayList<Message>();
+		ArrayList<Integer> message_ids = new ArrayList<Integer>();
 		Statement stmt = db.getConnectionStatement();
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Messages WHERE Messages.ReceiverID = " + username);
+			rs = stmt.executeQuery("SELECT * FROM Messages WHERE ReceiverID = \"" + username+"\";");
+			while (rs.next()){
+				int messageID = Integer.parseInt(rs.getString("MessageID"));
+				message_ids.add(messageID);
+			}
+			for (Integer id:message_ids){
+				messages.add(getMessage(id,db));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		if(rs != null) {
-			try {
-				messages.add(getMessage(rs.getInt(1), db));
-
-				while (rs.next()){
-					messages.add(getMessage(rs.getInt(1), db));
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+		
 		return messages;			
 	}
 

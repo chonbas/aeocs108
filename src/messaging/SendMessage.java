@@ -1,11 +1,16 @@
 package messaging;
 
 import java.io.IOException;
+
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import database.DB_Interface;
+import users.User;
 
 /**
  * Servlet implementation class SendMessage
@@ -26,16 +31,26 @@ public class SendMessage extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		RequestDispatcher dispatch = request.getRequestDispatcher("index.html");
+		dispatch.forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		DB_Interface db = (DB_Interface)this.getServletContext().getAttribute("db");
+		String recipient = request.getParameter("recipient");
+		String content = request.getParameter("content");
+		if (User.validateUsername(recipient, db)){
+			String sender = (String)request.getSession().getAttribute("activeUser");
+			Message msg = new Message(sender, recipient, content, db);
+			RequestDispatcher dispatch = request.getRequestDispatcher("welcome.jsp");
+			dispatch.forward(request, response);
+		} else {
+			RequestDispatcher dispatch = request.getRequestDispatcher("invalidLogin.html");
+			dispatch.forward(request, response);
+		}
 	}
 
 }

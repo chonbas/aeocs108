@@ -35,12 +35,14 @@ public class User {
 		
 		this.username = username;
 		this.admin = (username.equals(ADMIN_USER));
-		
+		int adminSQL = 0;
+		if (this.admin){
+			adminSQL = 1;
+		}
 		Statement stmt = db.getConnectionStatement();
 		try {
-			stmt.executeQuery("INSERT INTO Users (UserID, Password, Admin) "
-				+ "VALUES ('" + username + "','" + passwordHash + "','"+this.admin+"'");
-			
+			stmt.executeUpdate("INSERT INTO Users (UserID, Password, Admin) "
+				+ "VALUES ('" + username + "','" + passwordHash + "','"+adminSQL+"');");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -73,7 +75,7 @@ public class User {
 		ResultSet rs = null;
 		Statement stmt = db.getConnectionStatement();
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = " + username);
+			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = \"" + username+"\";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -88,7 +90,7 @@ public class User {
 			}
 		}
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend2 = " + username);
+			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend2 = \"" + username+"\";");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -117,7 +119,7 @@ public class User {
 		ResultSet rs;
 		Statement stmt = db.getConnectionStatement();
 		try {
-			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE Users.UserID = " + username);
+			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE UserID = \"" + username+"\";");
 			return new User(rs.getString("UserID"), rs.getString("Admin"));
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -134,12 +136,12 @@ public class User {
 		ResultSet rs = null;
 		Statement stmt = db.getConnectionStatement();
 		try {
-			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE Users.UserID = " + username);
+			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE UserID = \"" + username+"\";");
+			if(rs.first()) {
+				return true;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		if(rs != null) {
-			return true;
 		}
 		return false;
 	}
@@ -161,12 +163,12 @@ public class User {
 			e.printStackTrace();
 		}
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Users WHERE Users.UserID = " + username + " AND password = " + passwordHash);
+			rs = stmt.executeQuery("SELECT * FROM Users WHERE Users.UserID = \"" + username + "\" AND password = \"" + passwordHash+"\";");
+			if(rs.first()) {
+				return true;
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		if(rs != null) {
-			return true;
 		}
 		return false;		
 	}
