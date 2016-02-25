@@ -62,13 +62,14 @@ public class DB_Interface {
 	public User createUser(String username, String password){
 		try {
 			stmt.executeQuery("INSERT INTO Users (UserID, Password, Admin) "
-				+ "VALUES (','" + username + "','" + password + "','false'");
+				+ "VALUES ('" + username + "','" + password + "','false'");
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return getUser(username);
 	}
+	
 	public boolean validateUsername(String username) {
 		ResultSet rs = null;
 		try {
