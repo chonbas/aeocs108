@@ -42,9 +42,10 @@ public class SendMessage extends HttpServlet {
 		DB_Interface db = (DB_Interface)this.getServletContext().getAttribute("db");
 		String recipient = request.getParameter("recipient");
 		String content = request.getParameter("content");
+		int type = Integer.parseInt(request.getParameter("type"));
 		if (User.validateUsername(recipient, db)){
 			String sender = (String)request.getSession().getAttribute("activeUser");
-			Message msg = new Message(sender, recipient, content, db);
+			Message msg = new Message(sender, recipient, content, db, type);
 			RequestDispatcher dispatch = request.getRequestDispatcher("welcome.jsp");
 			dispatch.forward(request, response);
 		} else {

@@ -59,10 +59,16 @@ public class User {
 		this.admin = admin.equals("true");
 	}
 	
+	/*
+	 * get username field from user object
+	 */
 	public String getUsername(){
 		return this.username;
 	}
 	
+	/*
+	 * validate whether user is or isnt admin
+	 */
 	public boolean isAdmin(){
 		return this.admin;
 	}

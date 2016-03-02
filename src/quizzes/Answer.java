@@ -1,5 +1,7 @@
 package quizzes;
 
+import java.util.*;
+
 /* Class: Answer
  * --------------------
  * The Answer class encapsulates an answer to a question. An answer
@@ -12,7 +14,6 @@ package quizzes;
  * The following question types may keep a collection of mixed 
  * valid and invalid Answer objects: Multiple-Choice, 
  * Multiple-Choice with Multiple Answers, and Matching.
- * 
  */
 public class Answer {
 	private boolean valid;

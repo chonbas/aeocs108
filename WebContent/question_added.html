@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<!-- Meta -->
+<title>Question Created</title>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/semantic.css" />
+</head>
+
+<body>
+	<header>
+		<h1>Question Created</h1>
+	</header>
+	<p>The question has been created and added to the quiz.</p>
+	<p>
+		There are currently <b>[request.getSession.getAttribute("quiz").getNumQuestions()]</b>
+		questions in this quiz.
+	</p>
+	
+	<form action="create_question.jsp">
+		<input type="submit" value="Add another question">
+	</form>
+	<br>
+	<form action="FinishQuizCreationServlet" method="post">
+		<input type="submit" value="Finish">
+	</form>
+</body>
+
+</html>

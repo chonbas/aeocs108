@@ -22,19 +22,25 @@ import database.DB_Interface;
  */
 
 public class Message {
-
+	
+	public static final int FRIEND_REQUEST = 1;
+	public static final int CHALLENGE_REQUEST = 2;
+	public static final int NOTE = 3;
+	
 	private String sender_id;
 	private String receiver_id;
 	private String content;
+	private int type;
 	
-	public Message(String sender_id, String receiver_id, String content, DB_Interface db){
+	public Message(String sender_id, String receiver_id, String content, DB_Interface db, int type){
 		this.sender_id = sender_id;
 		this.receiver_id = receiver_id;
 		this.content = content;
+		this.type = type;
 		Statement stmt = db.getConnectionStatement();
 		try {
-			stmt.executeUpdate("INSERT INTO Messages (SenderID, ReceiverID, Content, Received, SenderDelete, ReceiverDelete, Alert) "
-				+ "VALUES (\"" + sender_id + "\",\"" + receiver_id + "\",\"" + content + "\",\"0\",\"0\",\"0\",\"0\");");
+			stmt.executeUpdate("INSERT INTO Messages (SenderID, ReceiverID, Content, Received, Type, SenderDelete, ReceiverDelete, Alert) "
+				+ "VALUES (\"" + sender_id + "\",\"" + receiver_id + "\",\"" + content + "\",\"0\",\""+type+"\",\"0\",\"0\");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -51,6 +57,10 @@ public class Message {
 	
 	public String getContent(){
 		return content;
+	}
+	
+	public int getType(){
+		return type;
 	}
 	
 	public void deleteMessage(String msg_id, String userRequesting, DB_Interface db){
@@ -125,6 +135,7 @@ public class Message {
 				this.sender_id = rs.getString("SenderID");
 				this.receiver_id = rs.getString("ReceiverID");
 				this.content = rs.getString("Content");
+				this.type = rs.getInt("Type");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

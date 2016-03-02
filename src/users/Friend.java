@@ -20,7 +20,7 @@ public class Friend {
 			}			
 		}
 		String content = "Hey " + recipient + ", " + sender + " would like to be your friend!";
-		return new Message(sender, recipient, content, db);
+		return new Message(sender, recipient, content, db, Message.FRIEND_REQUEST);
 	}
 
 	public static boolean validateFriendship(String friend1, String friend2, DB_Interface db){

@@ -35,6 +35,7 @@ CREATE TABLE Messages (
 	ReceiverID VARCHAR(100),
 	Content VARCHAR(10000),
 	Received BOOLEAN,
+	Type INTEGER,
 	SenderDelete BOOLEAN, 
 	ReceiverDelete BOOLEAN,
 	Alert BOOLEAN, 

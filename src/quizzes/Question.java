@@ -26,7 +26,9 @@ public class Question {
 	 * quiz-taker will see, a single valid Answer object, and the type of 
 	 * question (Question-Response, Multiple-Choice, etc).
 	 */
-	public Question(String text, Answer answer, String questionType) {
+	public Question(String text, Answer answer, String questionType, int questionNumber, String quiz_id) {
+		this.questionNumber = questionNumber;
+		this.quiz_id = quiz_id;
 		this.answerList = null;
 		this.text = text;
 		this.questionType = questionType;
@@ -42,10 +44,13 @@ public class Question {
 	 * Alternate constructor that accepts a list of Answer objects that may 
 	 * be valid or invalid, instead of just a single Answer. 
 	 */
-	public Question(String text, List<Answer> answers, String questionType, String questionNumber, String quiz_id) {
+	public Question(String text, List<Answer> answers, String questionType, int questionNumber, String quiz_id) {
+		this.questionNumber = questionNumber;
+		this.quiz_id = quiz_id;
 		this.answerList = answers;
 		this.text = text;
 		this.questionType = questionType;	
+		
 		preprocessAnswers(answers);
 	}
 	
@@ -110,6 +115,14 @@ public class Question {
 	
 	public String getQuestionType() {
 		return questionType;
+	}
+	
+	public int getQuestionNumber() {
+		return questionNumber;
+	}
+	
+	public String getQuizId() {
+		return quiz_id;
 	}
 	
 	/*
