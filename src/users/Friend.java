@@ -29,19 +29,16 @@ public class Friend {
 		if (User.validateUsername(friend1, db) && User.validateUsername(friend2, db)) {
 			try {
 				rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = " + friend1 + " AND Friends.friend2 = " + friend2);
+				if (rs.first()){
+					rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = " + friend2 + " AND Friends.friend2 = " + friend1);
+					if (rs.first()) return true;
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
-			if (rs == null) {
-				try {
-					rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = " + friend2 + " AND Friends.friend2 = " + friend1);
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 		}	
-		if (rs == null) return false;
-		return true;
+
+		return false;
 	}
 	
 	

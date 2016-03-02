@@ -18,6 +18,21 @@ public class User {
 	private String username;
 	private boolean admin;
 	
+	public static ArrayList<String> getAllUsers(DB_Interface db){
+		ArrayList<String> users = new ArrayList<String>();
+		ResultSet rs = null;
+		Statement stmt = db.getConnectionStatement();
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Users;");
+			while (rs.next()){
+				users.add(rs.getString("UserID"));
+			}				
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		Collections.sort(users);
+		return users;
+	}
 	
 	/*
 	 * User constructor - inserts new user into db and creates new user object
@@ -82,33 +97,19 @@ public class User {
 		Statement stmt = db.getConnectionStatement();
 		try {
 			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = \"" + username+"\";");
+			while (rs.next()){
+				friendsSent.add(rs.getString(2));
+			}	
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		if(rs != null) {
-			try {
-				friendsSent.add(rs.getString(2));
-				while (rs.next()){
-					friendsSent.add(rs.getString(2));
-				}				
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		try {
 			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend2 = \"" + username+"\";");
+			while (rs.next()){
+				friendsReceived.add(rs.getString(1));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
-		if(rs != null) {
-			try {
-				friendsReceived.add(rs.getString(1));
-				while (rs.next()){
-					friendsReceived.add(rs.getString(1));
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		friendsSent.retainAll(friendsReceived);
 		for (String friendName: friendsSent){
@@ -126,7 +127,9 @@ public class User {
 		Statement stmt = db.getConnectionStatement();
 		try {
 			rs = stmt.executeQuery("SELECT * FROM " + "Users WHERE UserID = \"" + username+"\";");
-			return new User(rs.getString("UserID"), rs.getString("Admin"));
+			if (rs.first()){
+				return new User(rs.getString("UserID"), rs.getString("Admin"));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

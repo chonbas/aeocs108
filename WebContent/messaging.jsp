@@ -5,7 +5,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<title>Welcome ${sessionScope.activeUser}</title>
+<title>Messaging - ${sessionScope.activeUser}</title>
+<link rel="stylesheet" href="css/semantic.css" />
 </head>
 <body>
 <h1>Welcome ${sessionScope.activeUser}</h1>
