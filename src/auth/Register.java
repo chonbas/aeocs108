@@ -49,7 +49,7 @@ public class Register extends HttpServlet {
 			dispatch.forward(request, response);
 		} else {
 			request.getSession().setAttribute("username", username);
-			RequestDispatcher dispatch = request.getRequestDispatcher("invalidNewAccount.jsp");
+			RequestDispatcher dispatch = request.getRequestDispatcher("auth/invalidNewAccount.jsp");
 			dispatch.forward(request, response);
 		}
 	}
