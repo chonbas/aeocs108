@@ -1,28 +1,23 @@
 package users;
 
 import java.io.IOException;
-
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import database.DB_Interface;
-import messaging.Message;
-
 /**
- * Servlet implementation class AcceptFriendRequest
+ * Servlet implementation class RejectFriendRequest
  */
-@WebServlet("/AcceptFriendRequest")
-public class AcceptFriendRequest extends HttpServlet {
+@WebServlet("/RejectFriendRequest")
+public class RejectFriendRequest extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public AcceptFriendRequest() {
+    public RejectFriendRequest() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -31,12 +26,8 @@ public class AcceptFriendRequest extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		DB_Interface db = (DB_Interface)this.getServletContext().getAttribute("db");
-		String target = (String)request.getParameter("rec");
-		String sender = (String)request.getParameter("snd");
-		Friend.confirmFriendRequest(sender, target, db);
-		RequestDispatcher dispatch = request.getRequestDispatcher("messaging.jsp");
-		dispatch.forward(request, response);
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	/**

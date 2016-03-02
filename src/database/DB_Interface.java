@@ -17,7 +17,6 @@ public class DB_Interface {
 	
  	private static final String account = MyDBInfo.MYSQL_USERNAME;
  	private static final String password = MyDBInfo.MYSQL_PASSWORD;
-
  	private static final String server = MyDBInfo.MYSQL_DATABASE_SERVER; 
  	private static final String database = MyDBInfo.MYSQL_DATABASE_NAME; 
  	 

@@ -8,18 +8,33 @@ import java.sql.Statement;
 import database.DB_Interface;
 
 public class Friend {
-
-	public static Message addFriendRequest(String sender, String recipient, DB_Interface db){	
+	
+	public static Message confirmFriendRequest(String sender, String recipient, DB_Interface db){
 		Statement stmt = db.getConnectionStatement();
 		if (User.validateUsername(sender, db) && User.validateUsername(recipient, db) && !validateFriendship(sender, recipient, db)) {
 			try {
-				stmt.executeQuery("INSERT INTO Friends (FriendID, Friend1, Friend2, Confirmed) "
-					+ "VALUES ('null','" + sender + "','" + recipient + "','false'");
+				stmt.executeUpdate("INSERT INTO Friends (Friend1, Friend2, Confirmed) "
+						+ "VALUES ('" + recipient + "','" + sender + "',1)");
+					
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}			
 		}
-		String content = "Hey " + recipient + ", " + sender + " would like to be your friend!";
+		String content = "Hey " + sender +"!<br>User: "+ recipient + " has accepted your friend request!";
+		return new Message(recipient, sender, content, db, Message.NOTE);
+	}
+	
+	public static Message addFriendRequest(String sender, String recipient, DB_Interface db){	
+		Statement stmt = db.getConnectionStatement();
+		if (User.validateUsername(sender, db) && User.validateUsername(recipient, db) && !validateFriendship(sender, recipient, db)) {
+			try {
+				stmt.executeUpdate("INSERT INTO Friends (Friend1, Friend2, Confirmed) "
+					+ "VALUES ('" + sender + "','" + recipient + "',0)");
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}			
+		}
+		String content = "Hey " + recipient+"!<br>User: "+ sender + " Wants to be your friend!<br> <a href='AcceptFriendRequest?snd="+sender+"&rec="+recipient+"'>Click here to accept!</a>";
 		return new Message(sender, recipient, content, db, Message.FRIEND_REQUEST);
 	}
 
@@ -28,9 +43,9 @@ public class Friend {
 		Statement stmt = db.getConnectionStatement();
 		if (User.validateUsername(friend1, db) && User.validateUsername(friend2, db)) {
 			try {
-				rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = " + friend1 + " AND Friends.friend2 = " + friend2);
+				rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = '" + friend1 + "' AND Friends.friend2 = '" + friend2 +"'");
 				if (rs.first()){
-					rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = " + friend2 + " AND Friends.friend2 = " + friend1);
+					rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = '" + friend2 + "' AND Friends.friend2 = '" + friend1+"'");
 					if (rs.first()) return true;
 				}
 			} catch (SQLException e) {

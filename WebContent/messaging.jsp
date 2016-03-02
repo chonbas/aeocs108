@@ -10,6 +10,7 @@
 </head>
 <body>
 <h1>Welcome ${sessionScope.activeUser}</h1>
+<a href="welcome.jsp">Back to home</a>
 <h3>Send a message</h3>
 <form action="SendMessage" method="post">
 To: <input type="text" name="recipient"></br>
@@ -23,8 +24,10 @@ DB_Interface db = (DB_Interface)application.getAttribute("db");
 out.println("<h3>Incoming Messages:</h3>");
 ArrayList<Message> inbox = Message.getIncomingMessages(currentUser, db);
 for (Message msg: inbox){
+	if (msg.isRead()) out.println("**New**");
 	out.println("From:"+msg.getSender()+"</br>");
 	out.println("Content:"+msg.getContent()+"</br>");
+	msg.markRead(db);
 }
 %>
 </div>

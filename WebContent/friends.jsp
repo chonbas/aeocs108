@@ -11,6 +11,7 @@
 <body>
 <div class="container">
 	<h1>Welcome ${sessionScope.activeUser}</h1>
+	<a href="welcome.jsp">Back to home</a>
 	<h3>Current Friends</h3>
 	<form action="SendMessage" method="post">
 	To: <input type="text" name="recipient"></br>
@@ -43,10 +44,11 @@
 		for (String user_id: user_ids){
 			User usr = User.getUser(user_id, db);
 			if (usr!= null){
+				if (usr.getUsername().equals(currentUser)) continue;
 				if (!Friend.validateFriendship(currentUser, usr.getUsername(), db)){
 					out.println("<li>");
 					out.println(usr.getUsername());
-					out.println("Send Friend Request? ");
+					out.println("<a href='SendFriendRequest?rec="+usr.getUsername()+"'>Send Friend Request</a>");
 					out.println("</li>");
 				}
 			}

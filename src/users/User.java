@@ -96,9 +96,9 @@ public class User {
 		ResultSet rs = null;
 		Statement stmt = db.getConnectionStatement();
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = \"" + username+"\";");
+			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = '" + username+"';");
 			while (rs.next()){
-				friendsSent.add(rs.getString(2));
+				friendsSent.add(rs.getString("Friend2"));
 			}	
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -106,7 +106,7 @@ public class User {
 		try {
 			rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend2 = \"" + username+"\";");
 			while (rs.next()){
-				friendsReceived.add(rs.getString(1));
+				friendsReceived.add(rs.getString("Friend1"));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
