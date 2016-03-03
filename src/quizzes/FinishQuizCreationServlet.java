@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class FinishQuizCreationServlet
  */
-@WebServlet("/FinishQuizCreationServlet")
+@WebServlet("/quizzes/FinishQuizCreationServlet")
 public class FinishQuizCreationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -37,7 +37,12 @@ public class FinishQuizCreationServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		DB_Interface db = (DB_Interface)request.getServletContext().getAttribute("db");
-		RequestDispatcher rd = request.getRequestDispatcher("quiz_created.html");
+		Quiz inProgress = (Quiz)request.getSession().getAttribute("quizInProgress");
+		
+		String currentUser = (String)request.getSession().getAttribute("activeUser");
+		Quiz.publish(currentUser, inProgress, db);
+		
+		RequestDispatcher rd = request.getRequestDispatcher("quiz_created.jsp");
 		rd.forward(request, response);
 	}
 

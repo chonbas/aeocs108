@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class QuizCreation
  */
-@WebServlet("/QuizCreation")
+@WebServlet("/quizzes/QuizCreation")
 public class QuizCreation extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -34,7 +34,10 @@ public class QuizCreation extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		Quiz newQuiz = new Quiz(null, null, null, null, false, false, false);
+		String name = request.getParameter("quiz_name");
+		String description = request.getParameter("quiz_descrip");
+		boolean randomQuestions = request.getParameter("question_order").equals("Random");
+		Quiz newQuiz = new Quiz(name, description, randomQuestions, false, false);
 		request.getSession().setAttribute("quizInProgress", newQuiz);
 		RequestDispatcher rd = request.getRequestDispatcher("create_question.jsp");
 		rd.forward(request, response);

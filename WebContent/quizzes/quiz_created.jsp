@@ -1,3 +1,5 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -10,7 +12,7 @@
         <h1>Quiz Created</h1>
     </header>
     <p>The quiz has been created and made public.</p>
-    <a href="#">Back to home</a>
+    <a href="../profile.jsp?user_id=${sessionScope.activeUser}">Back to home</a>
 </body>
 
 </html>

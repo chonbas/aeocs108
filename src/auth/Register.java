@@ -45,7 +45,7 @@ public class Register extends HttpServlet {
 		if (!User.validateUsername(username, db)){
 			User activeUser = new User(username, password, db);
 			request.getSession().setAttribute("activeUser",username);
-			RequestDispatcher dispatch = request.getRequestDispatcher("welcome.jsp");
+			RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+username);
 			dispatch.forward(request, response);
 		} else {
 			request.getSession().setAttribute("username", username);

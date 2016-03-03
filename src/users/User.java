@@ -200,10 +200,4 @@ public class User {
 	}
 	
 
-
-	
-
-	
-	
-	
 }

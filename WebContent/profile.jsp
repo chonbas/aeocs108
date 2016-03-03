@@ -22,7 +22,7 @@ if (currentUser.equals(profileOwner)){
 	}
 	out.println("<a href=\"messaging.jsp\">Messaging |"+ unreadMsgs + "</a> <br>");
 	out.println("<a href=\"friends.jsp\">Friends</a><br>");
-	out.println("<a href=\"QuizCreation\">Create new quiz</a> <br>");
+	out.println("<a href=\"quizzes/newQuiz.jsp\">Create new quiz</a> <br>");
 	out.println("<a href=\"Logout\">Log Out</a>");
 } else {
 	if (!Friend.validateFriendship(currentUser, profileOwner, db)){

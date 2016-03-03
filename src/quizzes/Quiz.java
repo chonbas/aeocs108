@@ -25,6 +25,7 @@ import java.util.*;
 public class Quiz {
 
 	private String name;
+	private String quizID;
 	private String descr;
 	private List<Question> questions; 
 	private List<Score> scores;
@@ -61,26 +62,27 @@ public class Quiz {
 		return null;
 	}
 	
-	
-	public void publish(DB_Interface db){
-		String quizID = quiz.getName();
+*/	
+	public static void publish(String username, Quiz quiz, DB_Interface db){
+		String quizID = quiz.getQuizID();
+		String quiz_name = quiz.getName();
+		Statement stmt = db.getConnectionStatement();
 		try {
 			Integer randomOrder = 0;
 			Integer multiPage = 0;
 			Integer immediateCorrection = 0;
-			if (quiz.getRandomOrder) randomOrder = 1;
-			if (quiz.getMultiPage) multiPage = 1;
-			if (quiz.immediateCorrection) immediateCorrection = 1;
-				
-			stmt.executeQuery("INSERT INTO Quizzes (QuizID, Description, RandomOrder, MultiPage, ImmediateCorrection) "
-				+ "VALUES ('" + quizID + "','" + "','" + quiz.getDescr() +  + "','" + randomOrder  + "','" + multiPage + "','" + immediateCorrection + "'");
+			if (quiz.getRandomOrder()) randomOrder = 1;
+			if (quiz.getMultiPage()) multiPage = 1;
+			if (quiz.getImmediateCorrection()) immediateCorrection = 1;	
+			stmt.executeUpdate("INSERT INTO Quizzes (QuizID, CreatorID, QuizName, Description, RandomOrder, MultiPage, ImmediateCorrection) "
+					+"VALUES (\""+ quizID +"\",\""+username+"\",\""+quiz_name+"\",\""+quiz.getDescription() +"\",\"" + randomOrder +"\",\"" + multiPage +"\",\"" + immediateCorrection +"\");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}			
 		for (Question question : quiz.getQuestions()) {
-			addQuestion();
+			Question.publish(question, db);
 		}
-	}*/
+	}
 	
 	/*
 	 * Used if creating a new quiz from scratch.
@@ -93,6 +95,7 @@ public class Quiz {
 		this.immediate_correction = immediate_correction;
 		this.name = name;
 		this.descr = descr;
+		this.quizID = "" + name.hashCode();
 	}
 	
 	/*
@@ -109,8 +112,31 @@ public class Quiz {
 		this.immediate_correction = immediate_correction;
 		this.name = name;
 		this.descr = descr;
+		this.quizID = "" + name.hashCode();
 	}
 	
+	
+	public String getQuizID(){
+		return quizID;
+	}
+	
+	public String getName(){
+		return name;
+	}
+	
+	public String getDescription(){
+		return descr;
+	}
+	
+	public boolean getRandomOrder(){
+		return random_order;
+	}
+	public boolean getMultiPage(){
+		return multi_page;
+	}
+	public boolean getImmediateCorrection(){
+		return immediate_correction;
+	}
 	/*
 	 * Returns a list of questions that belong to the quiz. 
 	 * If "random_order" is true, returns the questions in a random

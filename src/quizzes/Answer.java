@@ -2,7 +2,10 @@ package quizzes;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
+
+import database.DB_Interface;
 
 /* Class: Answer
  * --------------------
@@ -20,19 +23,12 @@ import java.util.*;
 public class Answer {
 	private boolean valid;
 	private String text;
-	private String questionNumber;
+	private int questionNumber;
 	private String quiz_id;
+	private int answerNumber;
 	
 	
-	
-//	 Answers
-//	 * ======================
-//	 * QuizID  VARCHAR(100),
-//	 * QuestionNumber INTEGER,
-//	 * AnswerNumber INTEGER,
-//	 * Text VARCHAR(1000),
-//	 * Valid BOOLEAN
-	 
+
 	
 	//	public Answer(String text, String questionNumber, String quiz_id, boolean valid) {
 /*	public ArrayList<Answer> getAnswers(String quizID, String questionNumber){
@@ -49,27 +45,36 @@ public class Answer {
 		}
 		return answers;
 	}
-
-	public addAnwer (Answer answer) {
+*/
+	
+//	 Answers
+//	 * ======================
+/*
+	QuizID  VARCHAR(100),
+	QuestionNumber INTEGER,
+	AnswerNumber INTEGER,
+	Text VARCHAR(1000),
+	Valid BOOLEAN,
+*/	 
+	
+	
+	public static void publish(Answer answer, DB_Interface db) {
+		Statement stmt = db.getConnectionStatement();
 		try {
 			int valid = 0;
 			if (answer.isValid()) valid = 1;
-			stmt.executeQuery("INSERT INTO Answers (QuizID, QuestionNumber, AnswerNumber, Text, Valid) "
-				+ "VALUES ('" + answer.getQuizID() + "','" + answer.getQuestionNumber() + "','" + answer.getAnswerNumber() + "','" + answer.getText() + "','" + valid + "'");
+			stmt.executeUpdate("INSERT INTO Answers (QuizID, QuestionNumber, AnswerNumber, Text, Valid) "
+				+ "VALUES ('" + answer.getQuizID() + "'," + answer.getQuestionNumber() + "," + answer.getAnswerNumber()+ ",\"" + answer.getText() + "\"," + valid + ");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}*/
+	}
 	
-	
-	
-	
-	
-	
-	public Answer(String text, String questionNumber, String quiz_id, boolean valid) {
+	public Answer(String text, int questionNumber, int answerNumber, String quiz_id, boolean valid) {
 		this.valid = valid;
 		this.text = text.toLowerCase();
 		this.questionNumber = questionNumber;
+		this.answerNumber = answerNumber;
 		this.quiz_id = quiz_id;
 	}
 	
@@ -77,15 +82,18 @@ public class Answer {
 		return text;
 	}
 	
+	public int getAnswerNumber(){
+		return answerNumber;
+	}
 	public boolean isValid() {
 		return valid;
 	}
 	
-	public String getQuizId() {
+	public String getQuizID() {
 		return quiz_id;
 	}
 	
-	public String getQuestionNumber() {
+	public int getQuestionNumber() {
 		return questionNumber;
 	}
 }

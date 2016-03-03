@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class CreateQuestionServlet
  */
-@WebServlet("/CreateQuestionServlet")
+@WebServlet("/quizzes/CreateQuestionServlet")
 public class CreateQuestionServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
@@ -29,7 +29,6 @@ public class CreateQuestionServlet extends HttpServlet {
      */
     public CreateQuestionServlet() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
@@ -45,38 +44,34 @@ public class CreateQuestionServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		List<Answer> answers;
 		String questionType = request.getParameter("question-type");
-		System.out.println(questionType);
+		Quiz inProgress = (Quiz)request.getSession().getAttribute("quizInProgress");
+		int questionNumber = inProgress.getQuestions().size();
 		
 		if (questionType.equals("question-response") 
 				|| questionType.equals("fill-in")
 				|| questionType.equals("picture-response")) {
 			
-			answers = createQuestionResponseAnswers(request);
+			answers = createQuestionResponseAnswers(request, questionNumber, inProgress.getQuizID());
 			
 		} else if (questionType.equals("multi-choice")) {
-			answers = createMultiChoiceAnswers(request);
+			answers = createMultiChoiceAnswers(request, questionNumber, inProgress.getQuizID());
 			
 		} else if (questionType.equals("multi-choice-multi-answer")) {
-			answers = createMultiChoiceMultiAnswers(request);
+			answers = createMultiChoiceMultiAnswers(request, questionNumber, inProgress.getQuizID());
 			
 		} else if (questionType.equals("multi-answer")) {
-			answers = createMultiAnswers(request);
+			answers = createMultiAnswers(request, questionNumber, inProgress.getQuizID());
 			
 		} else {
-			answers = createMatchingAnswers(request);
+			answers = createMatchingAnswers(request, questionNumber, inProgress.getQuizID());
 		}
 		
 		String questionText = request.getParameter("question-text");
-		Question question = new Question(questionText, answers, questionType, 4, "quiz_id");
 		
+		Question question = new Question(questionText, answers, questionType, questionNumber, inProgress.getQuizID());		
 		
-		Quiz inProgress = (Quiz)request.getSession().getAttribute("quizInProgress");
 		inProgress.addQuestion(question);
-		
-		// TODO: add quiz id and question number to Question constructor
-		// TODO: add question object to quiz stored in session 
-		// TODO: fix all of the constructors for Answers 
-		
+
 		RequestDispatcher rd = request.getRequestDispatcher("question_added.html");
 		rd.forward(request, response);
 	}
@@ -85,13 +80,14 @@ public class CreateQuestionServlet extends HttpServlet {
 	 * Returns list of Answer objects if question type is Question-Response, Fill-in,
 	 * or Picture-Response.
 	 */
-	private List<Answer> createQuestionResponseAnswers(HttpServletRequest request) {
+	private List<Answer> createQuestionResponseAnswers(HttpServletRequest request, int questionNumber, String quiz_id) {
 		List<String> answerTexts = getAnswerTexts(MAX_QUESTION_RESPONSE_ANS, request);
 		
 		List<Answer> answers = new ArrayList<Answer>();
 		
-		for (String text : answerTexts) {
-			answers.add(new Answer(text, "132", "quiz_id", true));
+		for (int i = 0; i < answerTexts.size();i++) {
+			String text = answerTexts.get(i);
+			answers.add(new Answer(text, questionNumber, i, quiz_id,true));
 		}
 		return answers;
 	}
@@ -99,17 +95,18 @@ public class CreateQuestionServlet extends HttpServlet {
 	/*
 	 * Returns list of Answer objects if question type is Multiple Choice.
 	 */
-	private List<Answer> createMultiChoiceAnswers(HttpServletRequest request) {
+	private List<Answer> createMultiChoiceAnswers(HttpServletRequest request, int questionNumber, String quiz_id) {
 		String validAnswer = request.getParameter("answer");
 		
 		List<String> answerTexts = getAnswerTexts(NUM_MULTI_CHOICE, request);
 		List<Answer> answers = new ArrayList<Answer>();
 		
-		for (String text : answerTexts) {
+		for (int i = 0; i < answerTexts.size();i++) {
+			String text = answerTexts.get(i);
 			if (validAnswer.equals(text)) {
-				answers.add(new Answer(text, "132", "quiz_id", true));
+				answers.add(new Answer(text, questionNumber, i,quiz_id,true));
 			} else {
-				answers.add(new Answer(text, "132", "quiz_id", false));
+				answers.add(new Answer(text, questionNumber, i, quiz_id, false));
 			}
 		}
 		return answers;
@@ -118,17 +115,18 @@ public class CreateQuestionServlet extends HttpServlet {
 	/*
 	 * Returns list of Answer objects if question type is Multiple Choice Multiple Answer
 	 */
-	private List<Answer> createMultiChoiceMultiAnswers(HttpServletRequest request) {
+	private List<Answer> createMultiChoiceMultiAnswers(HttpServletRequest request, int questionNumber, String quiz_id) {
 		List<String> validAnswers = Arrays.asList(request.getParameterValues("answer"));
 
 		List<String> answerTexts = getAnswerTexts(MAX_MULTI_CHOICE_MULTI_ANS, request);
 		List<Answer> answers = new ArrayList<Answer>();
 		
-		for (String text : answerTexts) {
+		for (int i = 0; i < answerTexts.size();i++) {
+			String text = answerTexts.get(i);
 			if (validAnswers.contains(text)) {
-				answers.add(new Answer(text, "132", "quiz_id", true));
+				answers.add(new Answer(text, questionNumber, i, quiz_id, true));
 			} else {
-				answers.add(new Answer(text, "132", "quiz_id", false));
+				answers.add(new Answer(text, questionNumber, i, quiz_id, false));
 			}
 		}
 		return answers;
@@ -137,18 +135,19 @@ public class CreateQuestionServlet extends HttpServlet {
 	/*
 	 * Returns list of Answer objects if question type is Multiple Answer.
 	 */
-	private List<Answer> createMultiAnswers(HttpServletRequest request) {
+	private List<Answer> createMultiAnswers(HttpServletRequest request, int questionNumber, String quiz_id) {
 		// TODO: handle the "ordered" checkbox
 		String validAnswers[] = request.getParameterValues("answer");
 		
 		List<String> answerTexts = getAnswerTexts(MAX_MULTI_ANSWERS, request);
 		List<Answer> answers = new ArrayList<Answer>();
 		
-		for (String text : answerTexts) {
+		for (int i = 0; i < answerTexts.size();i++) {
+			String text = answerTexts.get(i);
 			if (Arrays.asList(validAnswers).contains(text)) {
-				answers.add(new Answer(text, "132", "quiz_id", true));
+				answers.add(new Answer(text, questionNumber, i, quiz_id, true));
 			} else {
-				answers.add(new Answer(text, "132", "quiz_id", false));
+				answers.add(new Answer(text, questionNumber, i, quiz_id, false));
 			}
 		}
 		return answers;
@@ -157,7 +156,7 @@ public class CreateQuestionServlet extends HttpServlet {
 	/*
 	 * Returns list of Answer objects if question type is Matching.
 	 */
-	private List<Answer> createMatchingAnswers(HttpServletRequest request) {
+	private List<Answer> createMatchingAnswers(HttpServletRequest request, int questionNumber, String quiz_id) {
 		List<Answer> answers = new ArrayList<Answer>();
 		
 		for (int i = 1; i <= MAX_MATCHING_ANS; i++) {
@@ -168,7 +167,7 @@ public class CreateQuestionServlet extends HttpServlet {
 				"===" + request.getParameter(parameterEnd);
 			
 			if (!answerText.equals("===")) {
-				answers.add(new Answer(answerText, "132", "quiz_id", true));
+				answers.add(new Answer(answerText, questionNumber, i, quiz_id,true));
 			}
 		}
 		return answers;

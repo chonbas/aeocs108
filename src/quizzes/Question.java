@@ -1,7 +1,9 @@
 package quizzes;
 
 import java.sql.ResultSet;
+import database.*;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 /* Class: Question
@@ -39,18 +41,25 @@ public class Question {
 	 
 
 /*
-	public void addQuestion(Question question) {
+ * 	QuizID  VARCHAR(100),
+	QuestionNumber INTEGER,
+	Text VARCHAR(1000),
+	QuestionType VARCHAR(100),
+ */
+	public static void publish(Question question, DB_Interface db) {
+		Statement stmt = db.getConnectionStatement();
 		try {
-			stmt.executeQuery("INSERT INTO Questions (QuizID, QuestionNumber, Text, QuestionType) "
-				+ "VALUES ('" + quizID + "','" + question.getQuestionNumber() + "','" + question.getText() + "','" + question.getQuestionType() + "'");
+			stmt.executeUpdate("INSERT INTO Questions (QuizID, QuestionNumber, Text, QuestionType) "
+				+ "VALUES (\"" + question.getQuizId()+ "\"," + question.getQuestionNumber() + ",\"" + question.getText() + "\",\"" + question.getQuestionType() + "\");");
 			for (Answer answer : question.getAnswers()) {
-				addAnswer(answer);
+				Answer.publish(answer, db);
 			}
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
-
+/*
 	public ArrayList<Question> getQuizQuestions(String quizID){
 		ArrayList<Question> questions = new ArrayList<Question>();
 		ResultSet rs = null;

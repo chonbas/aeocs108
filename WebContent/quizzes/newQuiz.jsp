@@ -11,6 +11,10 @@
 <form action="QuizCreation" method="post">
 Quiz Name: <input type="text" name="quiz_name"><br>
 Quiz Description: <br><textarea name="quiz_descrip" rows="10" cols="60" placeholder="Please enter your description..."></textarea>
+<br>
+Question Ordering: 
+<input type="radio" name="question_order" value="In Order">In Order
+<input type="radio" name="question_order" value="Random">Random<br><br>
 <input type="submit" value="Start Quiz Creation">
 </form>
 
