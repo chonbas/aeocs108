@@ -125,7 +125,6 @@ public class Message {
 	public static Message getMessage(Integer messageID, DB_Interface db) {
 		Statement stmt = db.getConnectionStatement();
 		ResultSet rs = null;
-		System.out.println(messageID);
 		try {
 			rs = stmt.executeQuery("SELECT * FROM Messages WHERE MessageID = \"" + messageID+"\";");
 		} catch (SQLException e) {
@@ -135,18 +134,6 @@ public class Message {
 		return message;
 	}
 	
-	/*
-	 * Messages
-	 * ===============
-	 * MessageID	Integer (auto)
-	 * SenderID	String
-	 * ReceiverID	String
-	 * Content	String
-	 * Received	Boolean
-	 * SenderDelete	Boolean
-	 * ReceiverDelete	Boolean
-	 * Alert	Boolean
-	 */
 	private Message(ResultSet rs){
 		try {
 			if (rs.first()){

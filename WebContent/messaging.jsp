@@ -10,7 +10,7 @@
 </head>
 <body>
 <h1>Welcome ${sessionScope.activeUser}</h1>
-<a href="welcome.jsp">Back to home</a>
+<a href="profile.jsp?user_id=${sessionScope.activeUser}">Back to home</a>
 <h3>Send a message</h3>
 <form action="SendMessage" method="post">
 To: <input type="text" name="recipient"></br>

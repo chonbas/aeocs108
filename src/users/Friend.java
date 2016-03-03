@@ -9,6 +9,20 @@ import database.DB_Interface;
 
 public class Friend {
 	
+	public static boolean checkForFriendRequest(String sender, String recipient, DB_Interface db){
+		Statement stmt = db.getConnectionStatement();
+		ResultSet rs = null;
+		if (User.validateUsername(sender, db) && User.validateUsername(recipient, db)) {
+			try {
+				rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = '" + sender+ "' AND Friends.friend2 = '" + recipient +"'");
+				if (rs.first()) return true;
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}	
+		return false;
+	}
+	
 	public static Message confirmFriendRequest(String sender, String recipient, DB_Interface db){
 		Statement stmt = db.getConnectionStatement();
 		if (User.validateUsername(sender, db) && User.validateUsername(recipient, db) && !validateFriendship(sender, recipient, db)) {

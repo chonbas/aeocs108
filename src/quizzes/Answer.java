@@ -1,5 +1,7 @@
 package quizzes;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 /* Class: Answer
@@ -20,6 +22,49 @@ public class Answer {
 	private String text;
 	private String questionNumber;
 	private String quiz_id;
+	
+	
+	
+//	 Answers
+//	 * ======================
+//	 * QuizID  VARCHAR(100),
+//	 * QuestionNumber INTEGER,
+//	 * AnswerNumber INTEGER,
+//	 * Text VARCHAR(1000),
+//	 * Valid BOOLEAN
+	 
+	
+	//	public Answer(String text, String questionNumber, String quiz_id, boolean valid) {
+/*	public ArrayList<Answer> getAnswers(String quizID, String questionNumber){
+		ArrayList<Answer> answers = new ArrayList<Answer>();		
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Answers WHERE Questions.QuizID = " + quizID + " AND Questions.QuestionNumber = " + questionNumber);
+			answers.add(new Answer(rs.getString("Text"), questionNumber, quizID, rs.getBoolean("Valid")));
+			while (rs.next()) {
+				answers.add(new Answer(rs.getString("Text"), questionNumber, quizID, rs.getBoolean("Valid")));				
+			}			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return answers;
+	}
+
+	public addAnwer (Answer answer) {
+		try {
+			int valid = 0;
+			if (answer.isValid()) valid = 1;
+			stmt.executeQuery("INSERT INTO Answers (QuizID, QuestionNumber, AnswerNumber, Text, Valid) "
+				+ "VALUES ('" + answer.getQuizID() + "','" + answer.getQuestionNumber() + "','" + answer.getAnswerNumber() + "','" + answer.getText() + "','" + valid + "'");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}*/
+	
+	
+	
+	
+	
 	
 	public Answer(String text, String questionNumber, String quiz_id, boolean valid) {
 		this.valid = valid;

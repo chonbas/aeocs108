@@ -1,5 +1,7 @@
 package quizzes;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 /* Class: Question
@@ -9,6 +11,16 @@ import java.util.*;
  * Every question consists of question text (or a link to an image
  * in the case of picture questions), one or more answers that 
  * may be valid or invalid, and a question type. 
+ * 
+ * Questions Table:
+ * ====================
+ * QuizID	String
+ * QuestionNumber	Integer
+ * Text	String
+ * QuestionType	String
+ * 
+ * 
+ * 
  */
 public class Question {
 	
@@ -20,6 +32,61 @@ public class Question {
 	private List<Answer> answerList;
 	private Map<String, Answer> validAnswerMap; // maps the answer text to an Answer object for easy lookup of Answer objects 
 	private List<Answer> validAnswerList;
+	
+	
+/*	 public Question(String text, List<Answer> answers, String questionType, String guestionNumber, String quiz_id);
+	 public Answer(String text, boolean valid);*/
+	 
+
+/*
+	public void addQuestion(Question question) {
+		try {
+			stmt.executeQuery("INSERT INTO Questions (QuizID, QuestionNumber, Text, QuestionType) "
+				+ "VALUES ('" + quizID + "','" + question.getQuestionNumber() + "','" + question.getText() + "','" + question.getQuestionType() + "'");
+			for (Answer answer : question.getAnswers()) {
+				addAnswer(answer);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public ArrayList<Question> getQuizQuestions(String quizID){
+		ArrayList<Question> questions = new ArrayList<Question>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Questions WHERE Questions.QuizID = " + quizID);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}		
+		if(rs != null) {
+			try {
+				ArrayList<Answer> answers = getAnswers(quizID, rs.getString("QuestionType"));
+				if (answers.size() == 1) {
+					//questions.add(new Question(rs.getString("Text"),answers.get(0), rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
+				} else {
+					questions.add(new Question(rs.getString("Text"),answers, rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
+				}
+				
+				while (rs.next()){
+					answers = getAnswers(quizID, rs.getString("QuestionType"));
+					if (answers.size() == 1) {
+						//questions.add(new Question(rs.getString("Text"),answers.get(0), rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
+					} else {
+						questions.add(new Question(rs.getString("Text"),answers, rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return questions;
+	}*/
+	
+	
+	
+	
 	
 	/* 
 	 * Accepts the text that represents the question prompt that the 

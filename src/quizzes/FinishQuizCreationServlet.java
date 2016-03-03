@@ -1,5 +1,6 @@
 package quizzes;
 
+import database.*;
 import java.io.IOException;
 
 import javax.servlet.RequestDispatcher;
@@ -35,11 +36,7 @@ public class FinishQuizCreationServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO:
-		
-		// DBInterface db = request.getSession().getAttribute("database");
-		// db.addQuiz(request.getSession.getAttribute("quiz"));
-		
+		DB_Interface db = (DB_Interface)request.getServletContext().getAttribute("db");
 		RequestDispatcher rd = request.getRequestDispatcher("quiz_created.html");
 		rd.forward(request, response);
 	}

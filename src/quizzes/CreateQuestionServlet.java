@@ -36,7 +36,7 @@ public class CreateQuestionServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		response.sendError(404);
 	}
 
 	/**
@@ -70,7 +70,8 @@ public class CreateQuestionServlet extends HttpServlet {
 		Question question = new Question(questionText, answers, questionType, 4, "quiz_id");
 		
 		
-		// request.getSession.getAttribute("quiz").addQuestion()
+		Quiz inProgress = (Quiz)request.getSession().getAttribute("quizInProgress");
+		inProgress.addQuestion(question);
 		
 		// TODO: add quiz id and question number to Question constructor
 		// TODO: add question object to quiz stored in session 

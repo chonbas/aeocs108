@@ -11,13 +11,8 @@
 <body>
 <div class="container">
 	<h1>Welcome ${sessionScope.activeUser}</h1>
-	<a href="welcome.jsp">Back to home</a>
-	<h3>Current Friends</h3>
-	<form action="SendMessage" method="post">
-	To: <input type="text" name="recipient"></br>
-	Message: <textarea name="content" rows="10" cols="60"></textarea></br>
-	<input type="submit" value="Send">
-	</form>
+	<a href="profile.jsp?user_id=${sessionScope.activeUser}">Back to home</a>
+	<h3>Friends</h3>
 	<div id="friends">
 		<%
 		String currentUser = (String)session.getAttribute("activeUser");
@@ -29,7 +24,7 @@
 			User usr = User.getUser(friend_id, db);
 			if (usr != null){
 				out.println("<li>");
-				out.println(usr.getUsername());
+				out.println("<a href=\"profile.jsp?user_id="+usr.getUsername()+"\">"+usr.getUsername()+"</a>");
 				out.println("</li>");
 			}
 		}
@@ -47,8 +42,12 @@
 				if (usr.getUsername().equals(currentUser)) continue;
 				if (!Friend.validateFriendship(currentUser, usr.getUsername(), db)){
 					out.println("<li>");
-					out.println(usr.getUsername());
-					out.println("<a href='SendFriendRequest?rec="+usr.getUsername()+"'>Send Friend Request</a>");
+					out.println("<a href=\"profile.jsp?user_id="+usr.getUsername()+"\">"+usr.getUsername()+"</a>");
+					if (!Friend.checkForFriendRequest(currentUser, usr.getUsername(), db)){
+						out.println("- <a href='SendFriendRequest?rec="+usr.getUsername()+"'>Send Friend Request</a>");
+					} else {
+						out.println("- Friend request pending.");
+					}
 					out.println("</li>");
 				}
 			}

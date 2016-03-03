@@ -44,7 +44,7 @@ public class Login extends HttpServlet {
 		String password = request.getParameter("password");
 		if (User.validatePassword(username, password, db)){
 			request.getSession().setAttribute("activeUser",username);
-			RequestDispatcher dispatch = request.getRequestDispatcher("welcome.jsp");
+			RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+username);
 			dispatch.forward(request, response);
 		} else {
 			RequestDispatcher dispatch = request.getRequestDispatcher("auth/invalidLogin.html");

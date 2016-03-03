@@ -24,7 +24,6 @@ public class AcceptFriendRequest extends HttpServlet {
      */
     public AcceptFriendRequest() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**

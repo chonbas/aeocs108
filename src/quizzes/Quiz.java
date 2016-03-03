@@ -1,5 +1,8 @@
 package quizzes;
 
+import java.sql.*;
+import database.*;
+import users.*;
 import java.util.*;
 
 /*
@@ -9,6 +12,15 @@ import java.util.*;
  * quiz-taker score history, and provides functionality to score quizzes.
  * Maintains two lists of questions: one in the order created by 
  * the user, the other in random order.
+ * 
+ * Quiz table in database:
+ * 
+	 * Quizzes	
+	 * ====================
+	 * QuizID VARCHAR(100), 	
+	 * CreatorID VARCHAR(100), 
+	 * DateCreated DATE,
+	 * Description VARCHAR(10000),	
  */
 public class Quiz {
 
@@ -20,6 +32,55 @@ public class Quiz {
 	private boolean multi_page;
 	private boolean immediate_correction;
 	
+	
+	
+/*	public static Quiz getQuiz(String quizID, DB_Interface db){
+		Statement stmt = db.getConnectionStatement();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Quizzes WHERE QuizID = \"" + quizID+"\"");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}		
+		Quiz quiz;
+		if(rs != null) {
+			try {
+				ArrayList<Question> questions = getQuizQuestions(quizID);
+				ArrayList<Scores> scores = getScoresForQuiz(quizID);
+				String name = rs.getString("QuizID"));
+				String descr = rs.getString("CreatorID");				
+				boolean random = rs.getBoolean("RandomOrder");
+				boolean multi_page = rs.getBoolean("MultiPage");
+				boolean immediate_correction = rs.getBoolean("ImmediateCorrection");
+				quiz = new Quiz(questions, scores, name, descr, random, multi_page, immediate_correction);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	
+	
+	public void publish(DB_Interface db){
+		String quizID = quiz.getName();
+		try {
+			Integer randomOrder = 0;
+			Integer multiPage = 0;
+			Integer immediateCorrection = 0;
+			if (quiz.getRandomOrder) randomOrder = 1;
+			if (quiz.getMultiPage) multiPage = 1;
+			if (quiz.immediateCorrection) immediateCorrection = 1;
+				
+			stmt.executeQuery("INSERT INTO Quizzes (QuizID, Description, RandomOrder, MultiPage, ImmediateCorrection) "
+				+ "VALUES ('" + quizID + "','" + "','" + quiz.getDescr() +  + "','" + randomOrder  + "','" + multiPage + "','" + immediateCorrection + "'");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}			
+		for (Question question : quiz.getQuestions()) {
+			addQuestion();
+		}
+	}*/
 	
 	/*
 	 * Used if creating a new quiz from scratch.
