@@ -144,6 +144,7 @@ public class Question {
 	public int scoreAnswer(List<String> responses) {
 		int score = 0;
 		for (String response : responses) {
+			response = response.toLowerCase();
 			Answer ans = validAnswerMap.get(response);
 			if (ans != null) {
 				score++;

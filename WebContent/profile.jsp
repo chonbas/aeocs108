@@ -37,6 +37,7 @@ if (currentUser.equals(profileOwner)){
 	if (newFriendRequests > 0) out.println(" - "+ newFriendRequests + " New Friend Requests");
 	out.println("</a>");
 	out.println("  | <a href=\"quizzes/newQuiz.jsp\">Create new quiz</a>");
+	out.println("  | <a href=\"quizzes/quizzes.jsp\">Find and Take a Quiz!</a>");
 	out.println("  | <a href=\"Logout\">Log Out</a>");
 } else {
 	if (!Friend.validateFriendship(currentUser, profileOwner, db)){

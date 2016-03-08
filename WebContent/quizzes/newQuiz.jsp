@@ -21,6 +21,8 @@ if (session.getAttribute("activeUser") == null){
 	<div id="quiz-info">
 		<p>Quiz name:</p>
         <input type="text" id="name" name="quiz_name">
+		<p>Tags (separate with commas):</p>
+		<input type="text" id="tags" name="quiz_tags">
         <p>Description:</p>
         <textarea id="descr" name="quiz_descrip" rows="4" cols="50" placeholder="Please enter your description..."></textarea>
 		<p>Randomize question order for each quiz-taker <input type="checkbox" name="random" value="true"></p>

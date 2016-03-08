@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import="quizzes.*, database.*" %>
+<%@ page import="quizzes.*, database.*, java.util.*" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <%
@@ -18,6 +18,7 @@ request.getSession().setAttribute("startTime", null);
 %>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<link rel="stylesheet" href="css/semantic.css" />
 <title>Quiz Summary</title>
 </head>
 
@@ -25,11 +26,21 @@ request.getSession().setAttribute("startTime", null);
 
 <div id="summary">
 <h1><%= quiz.getName() %></h1>
-<p>created by <a href="../profile.jsp?user_id=<%=quiz.getAuthor()%>"><%= quiz.getAuthor() %></a></p> <!--  TODO: LINK THIS TO THE USER'S PROFILE PAGE -->
+<p>created by <a href="../profile.jsp?user_id=<%=quiz.getAuthor()%>"><%= quiz.getAuthor() %></a></p>
+<div id="tags">
+<p> Tags:
+<%
+List<Tag> tags = Tag.getTagsForQuiz(quiz_id, db);
+for (Tag tag: tags){
+	out.println(tag.getText()+ " | ");
+}
+%>
+
+</div>
 <p><b>Description:</b></p>
 <p><%= quiz.getDescription() %></p> 
 </div>
-
+<br>
 <div id="take-quiz">
 <%
 	String destination;
@@ -43,7 +54,7 @@ request.getSession().setAttribute("startTime", null);
     <input type="submit" value="Take Quiz">
 </form>
 </div>
-
+<br>
 <div id="top-scores">
 <h3>Top Scores</h3>
 	<% 
@@ -71,7 +82,7 @@ request.getSession().setAttribute("startTime", null);
 			}
 			out.println("</ol>");
 		} else {
-			out.println("<p>There is no score history for this quiz.</p>");
+			out.println("<p>There is no score history for this quiz.</p><br>");
 		}
 	%>
 </div>

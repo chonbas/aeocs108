@@ -39,6 +39,7 @@ public class Quiz {
 	private String timeFormatted;
 	private List<Question> questions; 
 	private List<Score> scores;
+	private List<Tag> tags;
 	private boolean random_order;
 	private boolean multi_page;
 	private boolean immediate_correction;
@@ -166,7 +167,8 @@ public class Quiz {
 					boolean immediate_correction = rs.getBoolean("ImmediateCorrection");
 					List<Question> questions = Question.getQuizQuestions(quizID, db);
 					List<Score> scores = Score.getScoresForQuiz(quizID, db);
-					quiz = new Quiz(questions, scores, name, creator, descr, random, multi_page, immediate_correction, timeCreated, timeFormatted);
+					List<Tag> tags = Tag.getTagsForQuiz(quizID, db);
+					quiz = new Quiz(questions, scores, tags, name, creator, descr, random, multi_page, immediate_correction, timeCreated, timeFormatted);
 					return quiz;
 				}
 				
@@ -176,7 +178,21 @@ public class Quiz {
 			return null;
 	}
 
-
+	public static Set<String> getAllQuizIDs(DB_Interface db){
+		Set<String> quizIDs = new HashSet<String>();
+		Statement stmt = db.getConnectionStatement();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Quizzes;");
+			while(rs.next()){
+				quizIDs.add(rs.getString("QuizID"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}			
+		return quizIDs;
+	}
+	
 	public static void publish(String username, Quiz quiz, DB_Interface db){
 		String quizID = quiz.getQuizID();
 		String quiz_name = quiz.getName();
@@ -200,12 +216,15 @@ public class Quiz {
 		for (Question question : quiz.getQuestions()) {
 			Question.publish(question, db);
 		}
+		for (Tag tag : quiz.getTags()) {
+			Tag.publish(tag, db);
+		}
 	}
 
 	/*
 	 * Used if creating a new quiz from scratch.
 	 */
-	public Quiz(String name, String descr, String author, boolean random, boolean multi_page, boolean immediate_correction) {
+	public Quiz(String name, String descr, String author, boolean random, boolean multi_page, boolean immediate_correction, String tags) {
 		this.questions = new ArrayList<Question>();
 		this.scores = new ArrayList<Score>();
 		this.author = author;
@@ -215,6 +234,7 @@ public class Quiz {
 		this.name = name;
 		this.descr = descr;
 		this.quizID = "" + name.hashCode();
+		this.tags = Tag.parseTags(quizID, tags);
 	}
 
 	/*
@@ -222,9 +242,10 @@ public class Quiz {
 	 * (useful for creating a Quiz object from data 
 	 * retrieved from the database).
 	 */
-	public Quiz(List<Question> questions, List<Score> scores, String name, String author, String descr, 
+	public Quiz(List<Question> questions, List<Score> scores, List<Tag> tags, String name, String author, String descr, 
 			boolean random, boolean multi_page, boolean immediate_correction, long timeCreated, String timeFormatted) {
 		this.questions = questions;
+		this.tags = tags;
 		this.author = author;
 		this.scores = scores;
 		this.random_order = random;
@@ -268,6 +289,9 @@ public class Quiz {
 	}
 	public boolean getImmediateCorrection(){
 		return immediate_correction;
+	}
+	private List<Tag> getTags() {
+		return tags;
 	}
 	/*
 	 * Returns a list of questions that belong to the quiz. 

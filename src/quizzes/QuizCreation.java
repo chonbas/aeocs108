@@ -53,7 +53,9 @@ public class QuizCreation extends HttpServlet {
 		if (request.getParameter("immediate") != null) immediateCorrection = true;
 		String author = (String)request.getSession().getAttribute("activeUser");
 		
-		Quiz newQuiz = new Quiz(name, description, author, randomQuestions, multiPage, immediateCorrection);
+		String tags = request.getParameter("quiz_tags");
+		
+		Quiz newQuiz = new Quiz(name, description, author, randomQuestions, multiPage, immediateCorrection, tags);
 		request.getSession().setAttribute("quizInProgress", newQuiz);
 		RequestDispatcher rd = request.getRequestDispatcher("create_question.jsp");
 		rd.forward(request, response);
