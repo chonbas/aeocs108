@@ -35,13 +35,22 @@ public class CreateQuestionServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.sendError(404);
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
+		RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+request.getSession().getAttribute("activeUser"));
+		dispatch.forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
 		List<Answer> answers;
 		String questionType = request.getParameter("question-type");
 		Quiz inProgress = (Quiz)request.getSession().getAttribute("quizInProgress");
@@ -72,7 +81,7 @@ public class CreateQuestionServlet extends HttpServlet {
 		
 		inProgress.addQuestion(question);
 
-		RequestDispatcher rd = request.getRequestDispatcher("question_added.html");
+		RequestDispatcher rd = request.getRequestDispatcher("question_added.jsp");
 		rd.forward(request, response);
 	}
 	
@@ -104,7 +113,7 @@ public class CreateQuestionServlet extends HttpServlet {
 		for (int i = 0; i < answerTexts.size();i++) {
 			String text = answerTexts.get(i);
 			if (validAnswer.equals(text)) {
-				answers.add(new Answer(text, questionNumber, i,quiz_id,true));
+				answers.add(new Answer(text, questionNumber, i, quiz_id,true));
 			} else {
 				answers.add(new Answer(text, questionNumber, i, quiz_id, false));
 			}
@@ -137,18 +146,13 @@ public class CreateQuestionServlet extends HttpServlet {
 	 */
 	private List<Answer> createMultiAnswers(HttpServletRequest request, int questionNumber, String quiz_id) {
 		// TODO: handle the "ordered" checkbox
-		String validAnswers[] = request.getParameterValues("answer");
-		
+
 		List<String> answerTexts = getAnswerTexts(MAX_MULTI_ANSWERS, request);
 		List<Answer> answers = new ArrayList<Answer>();
-		
+
 		for (int i = 0; i < answerTexts.size();i++) {
 			String text = answerTexts.get(i);
-			if (Arrays.asList(validAnswers).contains(text)) {
-				answers.add(new Answer(text, questionNumber, i, quiz_id, true));
-			} else {
-				answers.add(new Answer(text, questionNumber, i, quiz_id, false));
-			}
+			answers.add(new Answer(text, questionNumber, i, quiz_id, true));
 		}
 		return answers;
 	}
@@ -181,6 +185,7 @@ public class CreateQuestionServlet extends HttpServlet {
 		List<String> answerTexts = new ArrayList<String>();
 		for (int i = 1; i <= numAnswers; i++) {
 			String parameter = "answer" + Integer.toString(i);
+			System.out.println(request.getParameter(parameter));
 			if (!request.getParameter(parameter).isEmpty()) {
 				answerTexts.add(request.getParameter(parameter));
 			}

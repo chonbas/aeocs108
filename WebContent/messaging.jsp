@@ -3,6 +3,12 @@
 <%@ page import="messaging.*, database.*, users.*, java.util.*,javax.servlet.*" %> 
 <!DOCTYPE html>
 <html>
+<%
+if (session.getAttribute("activeUser") == null){
+	RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+	dispatch.forward(request, response);
+}
+%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Messaging - ${sessionScope.activeUser}</title>
@@ -14,7 +20,7 @@
 <h3>Send a message</h3>
 <form action="SendMessage" method="post">
 To: <input type="text" name="recipient"></br>
-Message: <textarea name="content" rows="10" cols="60"></textarea></br>
+Message:<br> <textarea name="content" rows="10" cols="60"></textarea></br>
 <input type="submit" value="Send">
 </form>
 <div id="inbox">
@@ -25,9 +31,11 @@ out.println("<h3>Incoming Messages:</h3>");
 ArrayList<Message> inbox = Message.getIncomingMessages(currentUser, db);
 for (Message msg: inbox){
 	if (msg.isRead()) out.println("**New**");
-	out.println("From:"+msg.getSender()+"</br>");
-	out.println("Content:"+msg.getContent()+"</br>");
+	out.println("From: "+msg.getSender()+"</br>");
+	out.println("Date Received: " + msg.getTimeFormatted() + "</br>");
+	out.println("Content: "+msg.getContent()+"</br>");
 	msg.markRead(db);
+	out.println("</br>");
 }
 %>
 </div>
@@ -36,8 +44,10 @@ for (Message msg: inbox){
 out.println("<h3>Outgoing Messages:</h3>");
 ArrayList<Message> outbox = Message.getOutboundMessages(currentUser, db);
 for (Message msg: outbox){
-	out.println("To:"+msg.getReceiver()+"</br>");
-	out.println("Content:"+msg.getContent()+"</br>");
+	out.println("To: "+msg.getReceiver()+"</br>");
+	out.println("Date Sent: " + msg.getTimeFormatted() + "</br>");
+	out.println("Content: "+msg.getContent()+"</br>");
+	out.println("</br>");
 }
 %>
 </div>

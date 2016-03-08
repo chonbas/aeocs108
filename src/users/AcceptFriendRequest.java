@@ -30,6 +30,10 @@ public class AcceptFriendRequest extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
 		DB_Interface db = (DB_Interface)this.getServletContext().getAttribute("db");
 		String target = (String)request.getParameter("rec");
 		String sender = (String)request.getParameter("snd");

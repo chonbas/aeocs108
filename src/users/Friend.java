@@ -14,7 +14,7 @@ public class Friend {
 		ResultSet rs = null;
 		if (User.validateUsername(sender, db) && User.validateUsername(recipient, db)) {
 			try {
-				rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = '" + sender+ "' AND Friends.friend2 = '" + recipient +"'");
+				rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = '" + sender+ "' AND friend2 = '" + recipient +"'");
 				if (rs.first()) return true;
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -23,6 +23,16 @@ public class Friend {
 		return false;
 	}
 	
+	public static void deleteFriendRequest(String friend1, String friend2, DB_Interface db){
+		Statement stmt = db.getConnectionStatement();
+		if (User.validateUsername(friend1, db) && User.validateUsername(friend2, db)){
+			try{
+				stmt.executeUpdate("DELETE FROM Friends where friend1 = '" + friend1 +"' AND friend2 = '" +friend2 + "'");
+			} catch (SQLException e){
+				e.printStackTrace();
+			}
+		}
+	}
 	public static Message confirmFriendRequest(String sender, String recipient, DB_Interface db){
 		Statement stmt = db.getConnectionStatement();
 		if (User.validateUsername(sender, db) && User.validateUsername(recipient, db) && !validateFriendship(sender, recipient, db)) {
@@ -57,9 +67,9 @@ public class Friend {
 		Statement stmt = db.getConnectionStatement();
 		if (User.validateUsername(friend1, db) && User.validateUsername(friend2, db)) {
 			try {
-				rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = '" + friend1 + "' AND Friends.friend2 = '" + friend2 +"'");
+				rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = '" + friend1 + "' AND friend2 = '" + friend2 +"'");
 				if (rs.first()){
-					rs = stmt.executeQuery("SELECT * FROM Friends WHERE Friends.friend1 = '" + friend2 + "' AND Friends.friend2 = '" + friend1+"'");
+					rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend1 = '" + friend2 + "' AND friend2 = '" + friend1+"'");
 					if (rs.first()) return true;
 				}
 			} catch (SQLException e) {
@@ -69,10 +79,6 @@ public class Friend {
 
 		return false;
 	}
-	
-	
-	
-	
 	
 	
 }

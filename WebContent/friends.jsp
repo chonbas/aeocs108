@@ -3,6 +3,12 @@
 <%@ page import="messaging.*, database.*, users.*, java.util.*,javax.servlet.*" %> 
 <!DOCTYPE html>
 <html>
+<%
+if (session.getAttribute("activeUser") == null){
+	RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+	dispatch.forward(request, response);
+}
+%>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title>Friends - ${sessionScope.activeUser}</title>
@@ -25,6 +31,7 @@
 			if (usr != null){
 				out.println("<li>");
 				out.println("<a href=\"profile.jsp?user_id="+usr.getUsername()+"\">"+usr.getUsername()+"</a>");
+				out.println("- <a href='Unfriend?rec="+usr.getUsername()+"'>Remove Friend</a>");
 				out.println("</li>");
 			}
 		}

@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+    pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 
 <head>
@@ -14,7 +16,7 @@
 	</header>
 	<p>The question has been created and added to the quiz.</p>
 	<p>
-		There are currently <b>[request.getSession.getAttribute("quiz").getNumQuestions()]</b>
+		There are currently <b>${sessionScope.quizInProgress.getQuestions().size()}</b>
 		questions in this quiz.
 	</p>
 	

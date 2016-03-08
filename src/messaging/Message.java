@@ -3,7 +3,13 @@ package messaging;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 
 import database.DB_Interface;
 
@@ -31,6 +37,8 @@ public class Message {
 	private String sender_id;
 	private String receiver_id;
 	private String content;
+	private String timeFormatted;
+	private long timeSent;
 	private int read;
 	private int type;
 	
@@ -40,10 +48,14 @@ public class Message {
 		this.content = content;
 		this.type = type;
 		this.read = 1;
+		this.timeSent= System.currentTimeMillis(); 
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date currentDate = Calendar.getInstance().getTime();
+		this.timeFormatted = formatter.format(currentDate);  
 		Statement stmt = db.getConnectionStatement();
 		try {
-			stmt.executeUpdate("INSERT INTO Messages (SenderID, ReceiverID, Content, Received, MessageType, SenderDelete, ReceiverDelete, Alert) "
-				+ "VALUES (\"" + sender_id + "\",\"" + receiver_id + "\",\"" + content + "\",\"0\","+type+",\"0\",\"0\",\"1\");");
+			stmt.executeUpdate("INSERT INTO Messages (SenderID, ReceiverID, Content, Received, TimeSent, TimeFormatted, Type, SenderDelete, ReceiverDelete, Alert) "
+				+ "VALUES (\"" + sender_id + "\",\"" + receiver_id + "\",\"" + content + "\",\"0\","+timeSent + ",\""+ timeFormatted+"\","+type+",\"0\",\"0\",\"1\");");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -69,6 +81,9 @@ public class Message {
 		return msg_id;
 	}
 	
+	public String getTimeFormatted(){
+		return timeFormatted;
+	}
 	public void markRead(DB_Interface db){
 		Statement stmt = db.getConnectionStatement();
 		try{
@@ -140,9 +155,11 @@ public class Message {
 				this.sender_id = rs.getString("SenderID");
 				this.receiver_id = rs.getString("ReceiverID");
 				this.content = rs.getString("Content");
-				this.type = rs.getInt("MessageType");
+				this.type = rs.getInt("Type");
 				this.msg_id = rs.getString("MessageID");
 				this.read = rs.getInt("Alert");
+				this.timeSent = rs.getLong("TimeSent");
+				this.timeFormatted = rs.getString("TimeFormatted");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -167,7 +184,7 @@ public class Message {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return messages;				
+		return sortByTime(messages);				
 	}
 	
 	public static ArrayList<Message> getIncomingMessages(String username, DB_Interface db) {
@@ -188,7 +205,18 @@ public class Message {
 			e.printStackTrace();
 		}
 		
-		return messages;			
+		return sortByTime(messages);			
+	}
+	
+	private static ArrayList<Message> sortByTime(ArrayList<Message> msgs){
+		Collections.sort(msgs, new Comparator<Message>(){
+		     public int compare(Message o1, Message o2){
+		         if(o1.timeSent == o2.timeSent)
+		             return 0;
+		         return o1.timeSent > o2.timeSent ? -1 : 1;
+		     }
+		});
+		return msgs;
 	}
 
 	

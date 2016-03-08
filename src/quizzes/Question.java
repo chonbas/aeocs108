@@ -46,12 +46,41 @@ public class Question {
 	Text VARCHAR(1000),
 	QuestionType VARCHAR(100),
  */
+	
+	public static ArrayList<Question> getQuizQuestions(String quizID, DB_Interface db){
+		ArrayList<Question> questions = new ArrayList<Question>();
+		ArrayList<String[]> question_stubs = new ArrayList<String[]>();
+		ResultSet rs = null;
+		Statement stmt = db.getConnectionStatement();
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Questions WHERE QuizID = \"" + quizID+"\";");
+			while (rs.next()){
+				String[] question_stub = new String[3];
+				question_stub[0] = rs.getString("Text");
+				question_stub[1] = rs.getString("QuestionType");
+				question_stub[2] =  "" + rs.getInt("QuestionNumber");
+				question_stubs.add(question_stub);
+			}
+			for (String[] question_stub: question_stubs){
+				String text = question_stub[0];
+				String questionType = question_stub[1];
+				int questionNumber = Integer.parseInt(question_stub[2]);
+				ArrayList<Answer> answers = Answer.getAnswersForQuestion(quizID, questionNumber, db);
+				questions.add(new Question(text,answers, questionType, questionNumber, quizID));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}		
+		return questions;
+	}
+	
 	public static void publish(Question question, DB_Interface db) {
 		Statement stmt = db.getConnectionStatement();
 		try {
 			stmt.executeUpdate("INSERT INTO Questions (QuizID, QuestionNumber, Text, QuestionType) "
 				+ "VALUES (\"" + question.getQuizId()+ "\"," + question.getQuestionNumber() + ",\"" + question.getText() + "\",\"" + question.getQuestionType() + "\");");
 			for (Answer answer : question.getAnswers()) {
+				System.out.println("ITERATING CHUGA CHUGA");
 				Answer.publish(answer, db);
 			}
 			
@@ -59,43 +88,6 @@ public class Question {
 			e.printStackTrace();
 		}
 	}
-/*
-	public ArrayList<Question> getQuizQuestions(String quizID){
-		ArrayList<Question> questions = new ArrayList<Question>();
-		ResultSet rs = null;
-		try {
-			rs = stmt.executeQuery("SELECT * FROM Questions WHERE Questions.QuizID = " + quizID);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}		
-		if(rs != null) {
-			try {
-				ArrayList<Answer> answers = getAnswers(quizID, rs.getString("QuestionType"));
-				if (answers.size() == 1) {
-					//questions.add(new Question(rs.getString("Text"),answers.get(0), rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
-				} else {
-					questions.add(new Question(rs.getString("Text"),answers, rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
-				}
-				
-				while (rs.next()){
-					answers = getAnswers(quizID, rs.getString("QuestionType"));
-					if (answers.size() == 1) {
-						//questions.add(new Question(rs.getString("Text"),answers.get(0), rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
-					} else {
-						questions.add(new Question(rs.getString("Text"),answers, rs.getString("QuestionType"), rs.getString("QuestionNumber"), quizID));						
-					}
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return questions;
-	}*/
-	
-	
-	
-	
 	
 	/* 
 	 * Accepts the text that represents the question prompt that the 
@@ -140,6 +132,15 @@ public class Question {
 		return score;	
 	}
 	
+	public int getPossiblePoints() {
+		if (questionType.equals("matching") || questionType.equals("multi-answer")) {
+				return answerList.size();
+		} else if (questionType.equals("multi-choice-multi-answer")) {
+			return validAnswerList.size();
+		} else {
+			return 1;
+		}			
+	}
 	/*
 	 * Implementation for multi-answer questions:
 	 * 
@@ -174,8 +175,6 @@ public class Question {
 	 * Should only be called if the questionType 
 	 * requires multiple answers to be displayed to the user 
 	 * (e.g. MC, MC with multiple answers, Matching).
-	 * 
-	 * Returns null if there is only one Answer. 
 	 */
 	public List<Answer> getAnswers() {
 		return answerList;
@@ -201,6 +200,7 @@ public class Question {
 		return quiz_id;
 	}
 	
+	
 	/*
 	 * Helper function that takes a list of answers and 
 	 * populates a map for quick valid answer lookup
@@ -224,7 +224,7 @@ public class Question {
 
 	- Question-Response/Fill in the blank: 
 		Ex. Q: Who was president during the Bay of Pigs fiasco? A: [president name]
-		Ex. Q: One of President LincolnÕs most famous speeches was the __________ Address. A: Gettysburg
+		Ex. Q: One of President Lincolnês most famous speeches was the __________ Address. A: Gettysburg
 
 	- Multiple Choice: User chooses one radio button to select correct answer
 

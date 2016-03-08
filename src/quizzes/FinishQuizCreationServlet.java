@@ -29,13 +29,22 @@ public class FinishQuizCreationServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
+		RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+request.getSession().getAttribute("activeUser"));
+		dispatch.forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
 		DB_Interface db = (DB_Interface)request.getServletContext().getAttribute("db");
 		Quiz inProgress = (Quiz)request.getSession().getAttribute("quizInProgress");
 		

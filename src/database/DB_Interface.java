@@ -1,5 +1,6 @@
 package database;
 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -36,7 +37,24 @@ public class DB_Interface {
  			e.printStackTrace(); 
  		} 
  	} 
- 	 
+ 	
+ 	/*
+ 	 * JUST FOR TESTING
+ 	 */
+ 	public Map<String, String> loadQuizMap() {
+ 		Map<String, String> quizzes = new HashMap<String, String>();
+ 		try {
+ 			ResultSet rs = stmt.executeQuery("SELECT * FROM Quizzes;");
+			while (rs.next()){
+				String quizID = rs.getString("QuizID");
+				String name =  rs.getString("QuizName");
+				quizzes.put(name, quizID);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}		
+		return quizzes;
+ 	}
  	 
  	public Statement getConnectionStatement(){ 
  		return stmt; 

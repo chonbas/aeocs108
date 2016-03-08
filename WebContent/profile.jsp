@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import="messaging.*, database.*, users.*, java.util.*,javax.servlet.*" %> 
+<%@ page import="messaging.*, database.*, users.*,quizzes.*, java.util.*,javax.servlet.*, java.sql.Statement" %> 
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,6 +11,10 @@
 <body>
 <h1>${param.user_id}</h1>
 <%
+if (session.getAttribute("activeUser") == null){
+	RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired	.html");
+	dispatch.forward(request, response);
+}
 String profileOwner = (String)request.getParameter("user_id");
 String currentUser = (String)session.getAttribute("activeUser");
 DB_Interface db = (DB_Interface)application.getAttribute("db");
@@ -36,6 +40,22 @@ if (currentUser.equals(profileOwner)){
 	}
 }
 %>
+
+<div id="allQuizzes">
+<%
+Map<String, String> quizMap = db.loadQuizMap();
+if (quizMap.size() != 0) {
+	out.println("<ol>");
+	for (String name : quizMap.keySet()) { // returns in order of highest score, or lowest time if a tie
+		out.println("<li><a href=\"quizzes/quiz_summary.jsp?quiz_id=" + quizMap.get(name) + "\">" + name + "</a></li>");
+	}
+	out.println("</ol>");
+} else {
+	out.println("<p>There are no quizzes to display.</p>");
+}
+%>
+</div>
+
 
 </body>
 </html>

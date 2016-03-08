@@ -31,7 +31,11 @@ public class SendMessage extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		RequestDispatcher dispatch = request.getRequestDispatcher("index.html");
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
+		RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+request.getSession().getAttribute("activeUser"));
 		dispatch.forward(request, response);
 	}
 
@@ -39,13 +43,17 @@ public class SendMessage extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
 		DB_Interface db = (DB_Interface)this.getServletContext().getAttribute("db");
 		String recipient = request.getParameter("recipient");
 		String content = request.getParameter("content");
 		if (User.validateUsername(recipient, db)){
 			String sender = (String)request.getSession().getAttribute("activeUser");
 			Message msg = new Message(sender, recipient, content, db, Message.NOTE);
-			RequestDispatcher dispatch = request.getRequestDispatcher("welcome.jsp");
+			RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+sender);
 			dispatch.forward(request, response);
 		} else {
 			RequestDispatcher dispatch = request.getRequestDispatcher("invalidLogin.html");

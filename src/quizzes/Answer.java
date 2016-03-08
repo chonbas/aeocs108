@@ -1,5 +1,6 @@
 package quizzes;
 
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -28,36 +29,21 @@ public class Answer {
 	private int answerNumber;
 	
 	
-
-	
-	//	public Answer(String text, String questionNumber, String quiz_id, boolean valid) {
-/*	public ArrayList<Answer> getAnswers(String quizID, String questionNumber){
-		ArrayList<Answer> answers = new ArrayList<Answer>();		
-		ResultSet rs = null;
+	public static ArrayList<Answer> getAnswersForQuestion(String quiz_id, int questionNumber, DB_Interface db){
+		ArrayList<Answer> answers = new ArrayList<Answer>();
+		ResultSet rs= null;
+		Statement stmt = db.getConnectionStatement();
+		
 		try {
-			rs = stmt.executeQuery("SELECT * FROM Answers WHERE Questions.QuizID = " + quizID + " AND Questions.QuestionNumber = " + questionNumber);
-			answers.add(new Answer(rs.getString("Text"), questionNumber, quizID, rs.getBoolean("Valid")));
-			while (rs.next()) {
-				answers.add(new Answer(rs.getString("Text"), questionNumber, quizID, rs.getBoolean("Valid")));				
-			}			
+			rs = stmt.executeQuery("SELECT * FROM Answers WHERE QuizID = \"" + quiz_id+"\" and QuestionNumber = " + questionNumber+ " ;");
+			while (rs.next()){
+				answers.add(new Answer(rs.getString("Text"),questionNumber, rs.getInt("AnswerNumber"), quiz_id, rs.getBoolean("Valid")));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-		}
+		}		
 		return answers;
 	}
-*/
-	
-//	 Answers
-//	 * ======================
-/*
-	QuizID  VARCHAR(100),
-	QuestionNumber INTEGER,
-	AnswerNumber INTEGER,
-	Text VARCHAR(1000),
-	Valid BOOLEAN,
-*/	 
-	
-	
 	public static void publish(Answer answer, DB_Interface db) {
 		Statement stmt = db.getConnectionStatement();
 		try {
@@ -74,8 +60,8 @@ public class Answer {
 		this.valid = valid;
 		this.text = text.toLowerCase();
 		this.questionNumber = questionNumber;
-		this.answerNumber = answerNumber;
 		this.quiz_id = quiz_id;
+		this.answerNumber = answerNumber;
 	}
 	
 	public String getText() {

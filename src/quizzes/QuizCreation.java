@@ -27,17 +27,33 @@ public class QuizCreation extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.sendError(404);
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
+		RequestDispatcher dispatch = request.getRequestDispatcher("profile.jsp?user_id="+request.getSession().getAttribute("activeUser"));
+		dispatch.forward(request, response);
 	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (request.getSession().getAttribute("activeUser") == null){
+			RequestDispatcher dispatch = request.getRequestDispatcher("loginRequired.html");
+			dispatch.forward(request, response);
+		}
 		String name = request.getParameter("quiz_name");
 		String description = request.getParameter("quiz_descrip");
-		boolean randomQuestions = request.getParameter("question_order").equals("Random");
-		Quiz newQuiz = new Quiz(name, description, randomQuestions, false, false);
+		boolean randomQuestions = false;
+		boolean multiPage = false;
+		boolean immediateCorrection = false;
+		if (request.getParameter("random") != null) randomQuestions = true;
+		if (request.getParameter("multi-page") != null) multiPage = true;
+		if (request.getParameter("immediate") != null) immediateCorrection = true;
+		String author = (String)request.getSession().getAttribute("activeUser");
+		
+		Quiz newQuiz = new Quiz(name, description, author, randomQuestions, multiPage, immediateCorrection);
 		request.getSession().setAttribute("quizInProgress", newQuiz);
 		RequestDispatcher rd = request.getRequestDispatcher("create_question.jsp");
 		rd.forward(request, response);
