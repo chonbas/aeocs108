@@ -35,11 +35,6 @@ public class Question {
 	private Map<String, Answer> validAnswerMap; // maps the answer text to an Answer object for easy lookup of Answer objects 
 	private List<Answer> validAnswerList;
 	
-	
-/*	 public Question(String text, List<Answer> answers, String questionType, String guestionNumber, String quiz_id);
-	 public Answer(String text, boolean valid);*/
-	 
-
 /*
  * 	QuizID  VARCHAR(100),
 	QuestionNumber INTEGER,
@@ -80,7 +75,6 @@ public class Question {
 			stmt.executeUpdate("INSERT INTO Questions (QuizID, QuestionNumber, Text, QuestionType) "
 				+ "VALUES (\"" + question.getQuizId()+ "\"," + question.getQuestionNumber() + ",\"" + question.getText() + "\",\"" + question.getQuestionType() + "\");");
 			for (Answer answer : question.getAnswers()) {
-				System.out.println("ITERATING CHUGA CHUGA");
 				Answer.publish(answer, db);
 			}
 			

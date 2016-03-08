@@ -66,8 +66,8 @@ request.getSession().setAttribute("startTime", null);
 		if (quiz.getScoreboard().size() != 0) {
 			out.println("<ol>");
 			for (Score score : quiz.getRecentScores()) {
-				out.println("<li>Date: " + score.getTimeFormatted() + " Score: " + score.getScore() + 
-						" Time: " + score.getTimeElapsed() + " User: <a href='../profile.jsp?user_id=" + score.getUserID() + "'>" + score.getUserID() + "</a></li>");
+				out.println("<li>Score: " + score.getScore() + " Time: " + score.getTimeElapsed() 
+				+ " Date: " + score.getTimeFormatted() + " User: <a href='../profile.jsp?user_id=" + score.getUserID() + "'>" + score.getUserID() + "</a></li>");
 			}
 			out.println("</ol>");
 		} else {

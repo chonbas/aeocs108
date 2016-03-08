@@ -1,9 +1,13 @@
 package quizzes;
 
 import java.sql.*;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+
 import database.*;
 import users.*;
 import java.util.*;
+import java.util.Date;
 
 /*
  * Class: Quiz
@@ -24,16 +28,127 @@ import java.util.*;
  */
 public class Quiz {
 
+	public static final long MS_IN_A_DAY = 86400000;
+	public static final long MS_IN_8_HOURS = 28800000;
+	public static final long MS_IN_HOUR = 3600000;
 	private String name;
 	private String author;
 	private String quizID;
 	private String descr;
+	private long timeCreated;
+	private String timeFormatted;
 	private List<Question> questions; 
 	private List<Score> scores;
 	private boolean random_order;
 	private boolean multi_page;
 	private boolean immediate_correction;
 
+	public static List<Quiz> getRecentlyCreatedQuizzes(DB_Interface db, long timeRange){
+		return getRecentlyCreatedQuizzes(db, timeRange, null);
+	}
+	
+	public static List<Quiz> getRecentlyCreatedQuizzes(DB_Interface db, long timeRange, String username){
+		long currentTime = System.currentTimeMillis();
+		long timeCutOff = currentTime - timeRange;
+		Statement stmt = db.getConnectionStatement();
+		List<Quiz> quizzes = new ArrayList<Quiz>();
+		List<String> quizIDs = new ArrayList<String>();
+		ResultSet rs = null;
+		try {
+			if (username == null){
+				rs = stmt.executeQuery("SELECT * FROM Quizzes WHERE DateCreated > " + timeCutOff+";");
+			} else {
+				rs = stmt.executeQuery("SELECT * FROM Quizzes WHERE CreatorID ='" + username + "' and DateCreated > " + timeCutOff+";");
+			}
+			while (rs.next()){
+				String quizID = rs.getString("QuizID");
+				quizIDs.add(quizID);
+			}
+			for (String quizID : quizIDs){
+				quizzes.add(Quiz.getQuiz(quizID, db));
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		Collections.sort(quizzes, new Comparator<Quiz>(){
+
+			@Override
+			public int compare(Quiz o1, Quiz o2) {
+				if (o1.timeCreated == o2.timeCreated) return 0;
+				if (o2.timeCreated > o1.timeCreated) return 1;
+				return -1;
+			}
+			
+		});
+		return quizzes;
+	}
+	
+	public static Set<String> getQuizzesTakenByUser(String username, DB_Interface db){
+		Set<String> quizzesTaken = new HashSet<String>();
+		Statement stmt = db.getConnectionStatement();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Scores WHERE UserID = \"" + username+"\";");
+			while(rs.next()){
+				String quizID = rs.getString("QuizID");
+				quizzesTaken.add(quizID);
+			}	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}			
+		return quizzesTaken;
+	}
+	
+	public static Set<String> getQuizzesByUser(String username, DB_Interface db){
+		Set<String> quizzesCreated = new HashSet<String>();
+		Statement stmt = db.getConnectionStatement();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery("SELECT * FROM Quizzes WHERE UserID = \"" + username+"\";");
+			while(rs.next()){
+				String quizID = rs.getString("QuizID");
+				quizzesCreated.add(quizID);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}			
+		return quizzesCreated;
+	}
+	
+	public static List<String> getPopularQuizzes(DB_Interface db){
+		return getPopularQuizzes(db, null);
+	}
+	
+	public static List<String> getPopularQuizzes(DB_Interface db, String username){
+		Statement stmt = db.getConnectionStatement();
+		Map<String, Integer> quizFreqs = new HashMap<String, Integer>();
+		Set<String> popularQuizzes = new HashSet<String>();
+		ResultSet rs = null;
+		try {
+ 			if (username == null){
+ 				rs = stmt.executeQuery("SELECT * FROM Scores;");
+ 			}else {
+ 				rs = stmt.executeQuery("SELECT * FROM Scores WHERE UserID = '" + username +"';");
+ 			}
+			while (rs.next()){
+				String quizID = rs.getString("QuizID");
+				if (!quizFreqs.containsKey(quizID)){
+					quizFreqs.put(quizID, 0);
+				}
+				quizFreqs.put(quizID,  quizFreqs.get(quizID) + 1);
+				popularQuizzes.add(quizID);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+ 		List<String> quizzes = new ArrayList<String>();
+ 		quizzes.addAll(popularQuizzes);
+ 		QuizPopularityComparator comp = new QuizPopularityComparator(quizFreqs);
+ 		Collections.sort(quizzes, comp);
+		return quizzes;
+
+	}
+	
 	public static Quiz getQuiz(String quizID, DB_Interface db){
 			Statement stmt = db.getConnectionStatement();
 			ResultSet rs = null;
@@ -46,10 +161,12 @@ public class Quiz {
 					String descr = rs.getString("Description");
 					boolean random = rs.getBoolean("RandomOrder");
 					boolean multi_page = rs.getBoolean("MultiPage");
+					String timeFormatted = rs.getString("TimeFormatted");
+					long timeCreated = rs.getLong("DateCreated");
 					boolean immediate_correction = rs.getBoolean("ImmediateCorrection");
 					List<Question> questions = Question.getQuizQuestions(quizID, db);
 					List<Score> scores = Score.getScoresForQuiz(quizID, db);
-					quiz = new Quiz(questions, scores, name, creator, descr, random, multi_page, immediate_correction);
+					quiz = new Quiz(questions, scores, name, creator, descr, random, multi_page, immediate_correction, timeCreated, timeFormatted);
 					return quiz;
 				}
 				
@@ -65,14 +182,18 @@ public class Quiz {
 		String quiz_name = quiz.getName();
 		Statement stmt = db.getConnectionStatement();
 		try {
+			long timeCreated = System.currentTimeMillis(); 
+			Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			Date currentDate = Calendar.getInstance().getTime();
+			String timeFormatted = formatter.format(currentDate); 
 			Integer randomOrder = 0;
 			Integer multiPage = 0;
 			Integer immediateCorrection = 0;
 			if (quiz.getRandomOrder()) randomOrder = 1;
 			if (quiz.getMultiPage()) multiPage = 1;
 			if (quiz.getImmediateCorrection()) immediateCorrection = 1;	
-			stmt.executeUpdate("INSERT INTO Quizzes (QuizID, CreatorID, QuizName, Description, RandomOrder, MultiPage, ImmediateCorrection) "
-					+"VALUES (\""+ quizID +"\",\""+username+"\",\""+quiz_name+"\",\""+quiz.getDescription() +"\",\"" + randomOrder +"\",\"" + multiPage +"\",\"" + immediateCorrection +"\");");
+			stmt.executeUpdate("INSERT INTO Quizzes (QuizID, CreatorID, QuizName, Description, RandomOrder, MultiPage, ImmediateCorrection, DateCreated, TimeFormatted) "
+					+"VALUES (\""+ quizID +"\",\""+username+"\",\""+quiz_name+"\",\""+quiz.getDescription() +"\",\"" + randomOrder +"\",\"" + multiPage +"\",\"" + immediateCorrection +"\", "+timeCreated+",'"+timeFormatted+"');");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}			
@@ -102,7 +223,7 @@ public class Quiz {
 	 * retrieved from the database).
 	 */
 	public Quiz(List<Question> questions, List<Score> scores, String name, String author, String descr, 
-			boolean random, boolean multi_page, boolean immediate_correction) {
+			boolean random, boolean multi_page, boolean immediate_correction, long timeCreated, String timeFormatted) {
 		this.questions = questions;
 		this.author = author;
 		this.scores = scores;
@@ -112,6 +233,8 @@ public class Quiz {
 		this.name = name;
 		this.descr = descr;
 		this.quizID = "" + name.hashCode();
+		this.timeCreated = timeCreated;
+		this.timeFormatted = timeFormatted;
 	}
 	
 	public String getAuthor() {
@@ -129,7 +252,14 @@ public class Quiz {
 	public String getDescription(){
 		return descr;
 	}
-
+	
+	public long getTimeCreated(){
+		return timeCreated;
+	}
+	
+	public String getTimeFormatted(){
+		return timeFormatted;
+	}
 	public boolean getRandomOrder(){
 		return random_order;
 	}
@@ -236,4 +366,6 @@ public class Quiz {
 		if (scores != null)	scores.add(result);
 		return result;
 	}
+	
+
 }

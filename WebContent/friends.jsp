@@ -50,8 +50,10 @@ if (session.getAttribute("activeUser") == null){
 				if (!Friend.validateFriendship(currentUser, usr.getUsername(), db)){
 					out.println("<li>");
 					out.println("<a href=\"profile.jsp?user_id="+usr.getUsername()+"\">"+usr.getUsername()+"</a>");
-					if (!Friend.checkForFriendRequest(currentUser, usr.getUsername(), db)){
-						out.println("- <a href='SendFriendRequest?rec="+usr.getUsername()+"'>Send Friend Request</a>");
+					if (Friend.checkForFriendRequest(usr.getUsername(), currentUser, db)){
+						out.println("- <a href='AcceptFriendRequest?rec="+currentUser+"&snd="+usr.getUsername()+"'>Has has sent you a Friend Request! Click here to accept.</a>");
+					} else if (!Friend.checkForFriendRequest(currentUser, usr.getUsername(), db)){
+						out.println("- <a href='SendFriendRequest?rec="+usr.getUsername()+"'>Send Friend Request.</a>");
 					} else {
 						out.println("- Friend request pending.");
 					}

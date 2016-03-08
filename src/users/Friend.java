@@ -23,6 +23,22 @@ public class Friend {
 		return false;
 	}
 	
+	public static int getPendingFriendRequests(String user, DB_Interface db){
+		Statement stmt = db.getConnectionStatement();
+		ResultSet rs = null;
+		int pendingRequests = 0;
+		if (User.validateUsername(user, db)) {
+			try {
+				rs = stmt.executeQuery("SELECT * FROM Friends WHERE friend2 = '" + user+ "' AND Confirmed = 0");
+				while(rs.next()){
+					pendingRequests++;
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}	
+		return pendingRequests;
+	}
 	public static void deleteFriendRequest(String friend1, String friend2, DB_Interface db){
 		Statement stmt = db.getConnectionStatement();
 		if (User.validateUsername(friend1, db) && User.validateUsername(friend2, db)){
@@ -39,6 +55,7 @@ public class Friend {
 			try {
 				stmt.executeUpdate("INSERT INTO Friends (Friend1, Friend2, Confirmed) "
 						+ "VALUES ('" + recipient + "','" + sender + "',1)");
+				stmt.executeUpdate("UPDATE Friends SET Confirmed=1 WHERE Friend1='" + sender +"' and Friend2='"+recipient+"';");
 					
 			} catch (SQLException e) {
 				e.printStackTrace();

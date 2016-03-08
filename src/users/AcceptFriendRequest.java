@@ -38,7 +38,7 @@ public class AcceptFriendRequest extends HttpServlet {
 		String target = (String)request.getParameter("rec");
 		String sender = (String)request.getParameter("snd");
 		Friend.confirmFriendRequest(sender, target, db);
-		RequestDispatcher dispatch = request.getRequestDispatcher("messaging.jsp");
+		RequestDispatcher dispatch = request.getRequestDispatcher("friends.jsp");
 		dispatch.forward(request, response);
 	}
 

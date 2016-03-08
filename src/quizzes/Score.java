@@ -16,7 +16,41 @@ public class Score implements Comparable {
 	private long timeElapsed;
 	private long timeCompleted;
 	String timeFormatted;
-		
+	
+	
+	public static List<Score> getRecentScores(DB_Interface db, long timeRange){
+		return getRecentScores(db, timeRange, null);
+	}
+	
+	public static List<Score> getRecentScores(DB_Interface db, long timeRange, String username){
+		long currentTime = System.currentTimeMillis();
+		long timeCutOff = currentTime - timeRange;
+		Statement stmt = db.getConnectionStatement();
+		List<Score> scores = new ArrayList<Score>();
+		ResultSet rs = null;
+		try {
+			if (username == null){
+				rs = stmt.executeQuery("SELECT * FROM Scores WHERE TimeTaken > " + timeCutOff+";");
+			} else {
+				rs = stmt.executeQuery("SELECT * FROM Scores WHERE UserID ='" + username + "' and TimeTaken > " + timeCutOff+";");
+			}
+			while (rs.next()){
+				String quizID = rs.getString("QuizID");
+				String userID = rs.getString("UserID");
+				Integer score = rs.getInt("Score");
+				long timeElapsed = rs.getLong("TimeElapsed");
+				long timeTaken = rs.getLong("TimeTaken");
+				String timeFormatted =rs.getString("TimeFormatted");
+				scores.add(new Score(score, userID, quizID, timeTaken, timeElapsed, timeFormatted));
+			}
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		Collections.sort(scores, new ScoreCompareByTime());
+		return scores;
+	}
+	
+	
 	public Score(Integer score, String userID, String quizID, long timeStarted) {
 		this.score = score;
 		this.userID = userID;
